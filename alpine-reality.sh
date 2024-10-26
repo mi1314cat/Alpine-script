@@ -283,6 +283,7 @@ cat << EOF > /root/Xray/clash-meta.yaml
   type: vless
   network: tcp
   udp: true
+  tls: true
   servername: "$dest_server"
   skip-cert-verify: true
   reality-opts:
@@ -292,7 +293,8 @@ cat << EOF > /root/Xray/clash-meta.yaml
   flow: xtls-rprx-vision
   client-fingerprint: chrome
 EOF
-
+cat /root/Xray/share-link.txt
+cat /root/Xray/clash-meta.yaml
 # 启动服务
 rc-update add xrayR default
 service xrayR start
