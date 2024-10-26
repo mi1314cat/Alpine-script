@@ -3,22 +3,29 @@
 ```bash
 apk add curl && apk add bash && bash <(curl -fsSL https://cfgithub.gw2333.workers.dev/https://github.com/mi1314cat/Alpine-script/raw/refs/heads/main/alpine.sh)
 ```
-## Alpine reality
+## Alpine-xary 
+### reality VEMSS SOCK5 三合一
+```bash
+apk add curl && apk add bash && bash <(curl -fsSL https://github.com/mi1314cat/Alpine-script/raw/refs/heads/main/allxray.sh)
+```
+
+
+### reality
 ```bash
 apk add curl && apk add bash && bash <(curl -fsSL https://github.com/mi1314cat/Alpine-script/raw/refs/heads/main/alpine-reality.sh)
 ```
-## xary
+### vemss sock 
 ```bash
 apk add curl && apk add bash && bash <(curl -fsSL https://github.com/mi1314cat/Alpine-script/raw/refs/heads/main/Alpine-xray.sh)
 ```
 
 ## Alpine-hysteria2 脚本
 
-一键安装
+### 一键安装
  ```bash
 apk add curl && apk add bash && bash <(curl -fsSL https://github.com/mi1314cat/Alpine-script/raw/refs/heads/main/alpine-hysteria2.sh)
 ```
-一键卸载
+### 一键卸载
 ```bash
 bash <(curl -fsSL https://github.com/mi1314cat/Alpine-script/raw/refs/heads/main/uninstall_alpine-hysteria2.sh)
 ```
