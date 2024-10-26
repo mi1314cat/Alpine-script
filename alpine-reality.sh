@@ -305,6 +305,6 @@ EOF
 # 启动服务
 rc-update add xrayR default
 service xrayR start
-
+service xrayR status
 green "安装完成！"
 green "分享链接已保存至 /root/Xray/share-link.txt"
