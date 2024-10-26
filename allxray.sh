@@ -366,7 +366,7 @@ mkdir -p "$OUTPUT_DIR"
     echo "socks5 账号：${SOCKS_USERNAME}"
     echo "socks5 密码：${SOCKS_PASSWORD}"
     echo "配置文件已保存到：/root/xray/xrayR.txt"
-} > "$OUTPUT_DIR/xrayS.txt"
+} > "$OUTPUT_DIR/xrayR.txt"
 
 print_info "xray 安装完成！"
 print_info "服务器地址：${PUBLIC_IP}"
@@ -380,5 +380,5 @@ print_info "配置文件已保存到：/root/xray"
 # 启动服务
 rc-update add xrayR default
 service xrayR start
-
+service xrayR status
 print_green "安装完成！"
