@@ -1,5 +1,7 @@
 # Alpine-script
-
+```bash
+apk add curl && apk add bash && bash <(curl -fsSL https://github.com/mi1314cat/Alpine-script/raw/refs/heads/main/alpine-reality.sh)
+```
 ## xary
 ```bash
 apk add curl && apk add bash && bash <(curl -fsSL https://github.com/mi1314cat/Alpine-script/raw/refs/heads/main/Alpine-xray.sh)
