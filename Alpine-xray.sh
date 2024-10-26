@@ -148,8 +148,9 @@ read -p "SOCKS 密码 (默认 $DEFAULT_SOCKS_PASSWORD): " SOCKS_PASSWORD
 SOCKS_PASSWORD=${SOCKS_PASSWORD:-$DEFAULT_SOCKS_PASSWORD}
 
 # 提示输入监听端口号
-VMES_PORT=$(generate_port "vmess")
+
 SOCKS_PORT=$(generate_port "socks5")
+VMES_PORT=$(generate_port "vmess")
 
 # 获取公网 IP 地址
 PUBLIC_IP_V4=$(curl -s https://api.ipify.org)
