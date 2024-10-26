@@ -1,15 +1,12 @@
-根据您的要求，我已经将脚本修改适配为 Alpine Linux 系统。以下是修改后的脚本：
-
-```bash
-#!/bin/bash
+#!/bin/sh
 # REALITY一键安装脚本
-printf "\e[92m"
+printf "\033[92m"
 printf "                       |\\__/,|   (\\\\ \n"
 printf "                     _.|o o  |_   ) )\n"
 printf "       -------------(((---(((-------------------\n"
 printf "                 catmi.REALITY-xray \n"
 printf "       -----------------------------------------\n"
-printf "\e[0m"
+printf "\033[0m"
 
 RED="\033[31m"      # Error message
 GREEN="\033[32m"    # Success message
@@ -22,38 +19,38 @@ CONFIG_FILE="/etc/${NAME}/config.json"
 SERVICE_FILE="/etc/init.d/${NAME}"
 
 colorEcho() {
-    echo -e "${1}${@:2}${PLAIN}"
+    printf "${1}%s${PLAIN}\n" "${@:2}"
 }
 
 checkSystem() {
-    if [[ $(id -u) -ne 0 ]]; then
-        colorEcho $RED " 请以root身份执行该脚本"
+    if [ "$(id -u)" -ne 0 ]; then
+        colorEcho "$RED" " 请以root身份执行该脚本"
         exit 1
     fi
 
-    if ! command -v apk &> /dev/null; then
-        colorEcho $RED " 不受支持的Linux系统"
+    if ! type apk > /dev/null 2>&1; then
+        colorEcho "$RED" " 不受支持的Linux系统"
         exit 1
     fi
 
-    apk update &> /dev/null
+    apk update > /dev/null
 }
 
 status() {
     export PATH=/usr/local/bin:$PATH
     cmd="$(command -v xray)"
-    if [[ "$cmd" = "" ]]; then
+    if [ -z "$cmd" ]; then
         echo 0
         return
     fi
-    if [[ ! -f $CONFIG_FILE ]]; then
+    if [ ! -f "$CONFIG_FILE" ]; then
         echo 1
         return
     fi
-    port=`grep -o '"port": [0-9]*' $CONFIG_FILE | awk '{print $2}'`
-    if [[ -n "$port" ]]; then
-        res=`ss -ntlp| grep ${port} | grep xray`
-        if [[ -z "$res" ]]; then
+    port=$(grep -o '"port": [0-9]*' "$CONFIG_FILE" | awk '{print $2}')
+    if [ -n "$port" ]; then
+        res=$(ss -ntlp | grep "$port" | grep xray)
+        if [ -z "$res" ]; then
             echo 2
         else
             echo 3
@@ -64,31 +61,31 @@ status() {
 }
 
 statusText() {
-    res=`status`
-    case $res in
+    res=$(status)
+    case "$res" in
         2)
-            echo -e ${GREEN}已安装xray${PLAIN} ${RED}未运行${PLAIN}
+            printf "${GREEN}已安装xray${PLAIN} ${RED}未运行${PLAIN}\n"
             ;;
         3)
-            echo -e ${GREEN}已安装xray${PLAIN} ${GREEN}正在运行${PLAIN}
+            printf "${GREEN}已安装xray${PLAIN} ${GREEN}正在运行${PLAIN}\n"
             ;;
         *)
-            echo -e ${RED}未安装xray${PLAIN}
+            printf "${RED}未安装xray${PLAIN}\n"
             ;;
     esac
 }
 
 preinstall() {
-    apk upgrade &> /dev/null
+    apk upgrade > /dev/null
     echo ""
     echo "安装必要软件，请等待..."
-    apk add curl openssl qrencode jq &> /dev/null
+    apk add curl openssl qrencode jq > /dev/null
     echo ""
 }
 
 # 定义函数，返回随机选择的域名
 random_website() {
-   domains=(
+    domains=(
         "one-piece.com"
         "lovelive-anime.jp"
         "swift.com"
@@ -119,12 +116,12 @@ random_website() {
         "mensura.cdn-apple.com"
         "osxapps.itunes.apple.com"
         "aod.itunes.apple.com"
-	"www.google-analytics.com"
+        "www.google-analytics.com"
         "dl.google.com"
     )
 
     total_domains=${#domains[@]}
-    random_index=$((RANDOM % total_domains))
+    random_index=$(shuf -i 0-$((total_domains - 1)) -n 1)
 
     # 输出选择的域名
     echo "${domains[random_index]}"
@@ -135,13 +132,14 @@ installXray() {
     echo ""
     echo "正在安装Xray..."
     VERSION=$(curl -s "https://api.github.com/repos/XTLS/Xray-core/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
-    if [[ -z "$VERSION" ]]; then
-        print_error "无法获取 Xray 最新版本信息"
+    if [ -z "$VERSION" ]; then
+        colorEcho "$RED" "无法获取 Xray 最新版本信息"
         exit 1
     fi
 
     # 设置适合架构的下载链接
-    case $CORE_ARCH in
+    CORE_ARCH=$(uname -m)
+    case "$CORE_ARCH" in
         x86_64)
             ARCH="64"
             ;;
@@ -152,19 +150,19 @@ installXray() {
             ARCH="armv7a"
             ;;
         *)
-            print_error "不支持的架构: ${CORE_ARCH}"
+            colorEcho "$RED" "不支持的架构: $CORE_ARCH"
             exit 1
             ;;
     esac
 
     # 下载并解压 Xray
     echo "正在下载 Xray 版本 ${VERSION}..."
-    curl -L "https://github.com/XTLS/Xray-core/releases/download/${VERSION}/Xray-linux-${ARCH}.zip" -o Xray-linux-${ARCH}.zip || { print_error "下载 Xray 失败"; exit 1; }
-    unzip Xray-linux-${ARCH}.zip || { print_error "解压 Xray 失败"; exit 1; }
-    mv xray /usr/local/bin/ || { print_error "移动文件失败"; exit 1; }
+    curl -L "https://github.com/XTLS/Xray-core/releases/download/${VERSION}/Xray-linux-${ARCH}.zip" -o Xray-linux-${ARCH}.zip || { colorEcho "$RED" "下载 Xray 失败"; exit 1; }
+    unzip Xray-linux-${ARCH}.zip || { colorEcho "$RED" "解压 Xray 失败"; exit 1; }
+    mv xray /usr/local/bin/ || { colorEcho "$RED" "移动文件失败"; exit 1; }
     rm -f Xray-linux-${ARCH}.zip  # 清理下载的 zip 文件
 
-    chmod +x /usr/local/bin/xray || { print_error "修改权限失败"; exit 1; }
+    chmod +x /usr/local/bin/xray || { colorEcho "$RED" "修改权限失败"; exit 1; }
     sleep 5
 }
 
