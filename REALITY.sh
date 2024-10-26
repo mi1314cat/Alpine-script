@@ -250,28 +250,32 @@ getip() {
 
 getport() {
     echo ""
-    while true
-    do
+    while true; do
         read -p "请设置XRAY的端口号[1025-65535]，不输入则随机生成:" PORT
-        [[ -z "$PORT" ]] && PORT=`shuf -i1025-65000 -n1`
-        if [[ "${PORT:0:1}" = "0" ]]; then
-            echo -e " ${RED}端口不能以0开头${PLAIN}"
+        # 如果未输入，则生成随机端口
+        [ -z "$PORT" ] && PORT=$(shuf -i 1025-65000 -n 1)
+        
+        # 判断端口是否以0开头
+        if [ "${PORT:0:1}" = "0" ]; then
+            echo "端口不能以0开头"
             exit 1
         fi
-        expr $PORT + 0 &>/dev/null
-        if [[ $? -eq 0 ]]; then
-            if [[ $PORT -ge 1025 ]] && [[ $PORT -le 65535 ]]; then
+        
+        # 验证是否为数字
+        if echo "$PORT" | grep -Eq '^[0-9]+$'; then
+            if [ "$PORT" -ge 1025 ] && [ "$PORT" -le 65535 ]; then
                 echo "$PORT" > /usr/local/etc/xray/port
-                colorEcho $BLUE "端口号：$PORT"
+                echo "端口号：$PORT"
                 break
             else
-                colorEcho $RED "输入错误，端口号为1025-65535的数字"
+                echo "输入错误，端口号为1025-65535的数字"
             fi
         else
-            colorEcho $RED "输入错误，端口号为1025-65535的数字"
+            echo "输入错误，端口号为1025-65535的数字"
         fi
     done
 }
+
 
 setFirewall() {
     echo ""
