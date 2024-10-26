@@ -307,34 +307,7 @@ echo "${share_link}" > /root/Xray/share-link.txt
 
 # 生成 Clash Meta 配置文件
 cat << EOF > /root/Xray/clash-meta.yaml
-port: 7890
-socks-port: 7891
-allow-lan: true
-mode: Rule
-log-level: info
-external-controller: :9090
-dns:
-    enable: true
-    ipv6: false
-    default-nameserver: [223.5.5.5, 119.29.29.29]
-    enhanced-mode: redir
-    fake-ip-filter: ["geoip:cn","http://geosite.geosite.dat"]
-proxy-groups:
-  - name: "Auto"
-    type: url-test
-    url: "http://www.gstatic.com/generate_204"
-    interval: 300
-    proxies:
-      - "自定义"
-      - "clash"
-      - "gfw"
-  - name: "自定义"
-    type: select
-    proxies:
-      - "Auto"
-      - "clash"
-      - "gfw"
-proxies:
+
   - name: "gfw"
     type: vless
     server: "$IP"
