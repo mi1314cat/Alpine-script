@@ -178,14 +178,34 @@ done
 UUID=$(cat /proc/sys/kernel/random/uuid)
 read -rp "请输入回落域名: " dest_server
 [ -z "$dest_server" ] && dest_server=$(random_website)
+# 生成随机 ID
 short_id=$(dd bs=4 count=2 if=/dev/urandom | xxd -p -c 8)
-keys=$(/usr/local/bin/xrayR x25519)
-private_key=$(echo "$keys" | awk '{print $3}')
-public_key=$(echo "$keys" | awk '{print $6}')
-green "private_key: $private_key"
-green "public_key: $public_key"
-green "short_id: $short_id"
 
+getkey() {
+    echo "正在生成私钥和公钥，请妥善保管好..."
+    mkdir -p /usr/local/etc/xray
+
+    # 生成密钥并保存到文件
+    /usr/local/bin/xrayR x25519 > /usr/local/etc/xray/key || {
+        print_error "生成密钥失败"
+        return 1
+    }
+
+    # 提取私钥和公钥
+    private_key=$(awk 'NR==1 {print $3}' /usr/local/etc/xray/key)
+    public_key=$(awk 'NR==2 {print $3}' /usr/local/etc/xray/key)
+
+    # 保存密钥到文件
+    echo "$private_key" > /usr/local/etc/xray/privatekey
+    echo "$public_key" > /usr/local/etc/xray/publickey
+
+    # 输出密钥
+    KEY=$(cat /usr/local/etc/xray/key)
+    print_blue "$KEY"
+
+    echo ""
+}
+getkey
 # 生成 Xray 配置文件
 rm -f /root/Xray/config.json
 cat << EOF > /root/Xray/config.json
@@ -214,7 +234,7 @@ cat << EOF > /root/Xray/config.json
                   "serverNames": [
                       "$dest_server"
                   ],
-                  "privateKey": "$private_key",
+                  "privateKey": "$(cat /usr/local/etc/xray/privatekey)",
                   "minClientVer": "",
                   "maxClientVer": "",
                   "maxTimeDiff": 0,
@@ -252,54 +272,25 @@ IP=$(wget -qO- --no-check-certificate -U Mozilla https://api.ip.sb/geoip | sed -
 green "您的IP为：$IP"
 
 # 生成分享链接
-share_link="vless://$UUID@$IP:$port?encryption=none&flow=xtls-rprx-vision&security=reality&sni=$dest_server&fp=chrome&pbk=$public_key&sid=$short_id&type=tcp&headerType=none#Reality"
+share_link="vless://$UUID@$IP:$port?encryption=none&flow=xtls-rprx-vision&security=reality&sni=$dest_server&fp=chrome&pbk=$(cat /usr/local/etc/xray/publickey)&sid=$short_id&type=tcp&headerType=none#Reality"
 echo "${share_link}" > /root/Xray/share-link.txt
 
 # 生成 Clash Meta 配置文件
 cat << EOF > /root/Xray/clash-meta.yaml
-port: 7890
-socks-port: 7891
-allow-lan: true
-mode: Rule
-log-level: info
-external-controller: :9090
-dns:
-    enable: true
-    ipv6: false
-    default-nameserver: [223.5.5.5, 119.29.29.29]
-    enhanced-mode: redir
-    fake-ip-filter: ["geoip:cn","http://geosite.geosite.dat"]
-proxy-groups:
-  - name: "Auto"
-    type: url-test
-    url: "http://www.gstatic.com/generate_204"
-    interval: 300
-    proxies:
-      - "自定义"
-      - "clash"
-      - "gfw"
-  - name: "自定义"
-    type: select
-    proxies:
-      - "Auto"
-      - "clash"
-      - "gfw"
-proxies:
-  - name: "gfw"
-    type: vless
-    server: "$IP"
-    port: $port
-    uuid: "$UUID"
-    alterId: 0
-    cipher: "none"
-    tls: true
-    skip-cert-verify: true
-    server-name: "$dest_server"
-    network: "tcp"
-    tcp-options:
-      type: "none"
-    udp: true
-    # 这里可以添加其他的设置...
+- name: Reality
+  port:  $port
+  server: "$IP"
+  type: vless
+  network: tcp
+  udp: true
+  servername: "$dest_server"
+  skip-cert-verify: true
+  reality-opts:
+    public-key: $(cat /usr/local/etc/xray/publickey)
+    short-id: $short_id
+  uuid: "$UUID"
+  flow: xtls-rprx-vision
+  client-fingerprint: chrome
 EOF
 
 # 启动服务
