@@ -37,6 +37,24 @@ print_info() {
     print_green "信息：$1"
 }
 
+# 系统信息
+SYSTEM_NAME=$(cat /etc/os-release | grep -i pretty_name | cut -d \" -f2)
+CORE_ARCH=$(arch)
+
+# 介绍信息
+clear
+cat << "EOF"
+                       |\__/,|   (\\
+                     _.|o o  |_   ) )
+       -------------(((---(((-------------------
+                    catmi.xrayS
+       -----------------------------------------
+EOF
+echo -e "${GREEN}System: ${PLAIN}${SYSTEM_NAME}"
+echo -e "${GREEN}Architecture: ${PLAIN}${CORE_ARCH}"
+echo -e "${GREEN}Version: ${PLAIN}1.0.0"
+echo -e "----------------------------------------"
+
 # 获取当前架构
 CORE_ARCH=$(uname -m)
 
