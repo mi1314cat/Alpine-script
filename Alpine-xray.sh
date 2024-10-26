@@ -48,6 +48,7 @@ generate_uuid() {
 generate_ws_path() {
     echo "/$(tr -dc 'a-zA-Z0-9' < /dev/urandom | head -c 10)"
 }
+apk add iproute2
 
 # 下载并安装最新 Xray 版本的函数
 install_xray() {
