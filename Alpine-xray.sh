@@ -49,17 +49,29 @@ generate_ws_path() {
     echo "/$(tr -dc 'a-zA-Z0-9' < /dev/urandom | head -c 10)"
 }
 
-# 安装 xray
-echo "安装最新 Xray..."
-apk add --no-cache curl bash unzip || { print_error "安装依赖失败"; exit 1; }
-wget https://github.com/XTLS/Xray-core/releases/download/v1.9.1/Xray-linux-64.zip || { print_error "下载 Xray 失败"; exit 1; }
-unzip Xray-linux-64.zip || { print_error "解压 Xray 失败"; exit 1; }
-mv xray /usr/local/bin/xrayS || { print_error "移动文件失败"; exit 1; }
-rm -f Xray-linux-64.zip  # 清理下载的 zip 文件
+# 下载并安装最新 Xray 版本的函数
+install_xray() {
+    # 获取最新版本号
+    VERSION=$(curl -s "https://api.github.com/repos/XTLS/Xray-core/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
+    if [[ -z "$VERSION" ]]; then
+        print_error "无法获取 Xray 最新版本信息"
+        exit 1
+    fi
 
-chmod +x /usr/local/bin/xrayS || { print_error "修改权限失败"; exit 1; }
+    # 下载并解压 Xray
+    echo "正在下载 Xray 版本 ${VERSION}..."
+    curl -L "https://github.com/XTLS/Xray-core/releases/download/${VERSION}/Xray-linux-64.zip" -o Xray-linux-64.zip || { print_error "下载 Xray 失败"; exit 1; }
+    unzip Xray-linux-64.zip || { print_error "解压 Xray 失败"; exit 1; }
+    mv xray /usr/local/bin/xrayS || { print_error "移动文件失败"; exit 1; }
+    rm -f Xray-linux-64.zip  # 清理下载的 zip 文件
 
-# 创建 openrc 服务
+    chmod +x /usr/local/bin/xrayS || { print_error "修改权限失败"; exit 1; }
+}
+
+# 执行安装函数
+install_xray
+
+# 创建 openrc 服务文件
 cat <<EOF >/etc/init.d/xrayS
 #!/sbin/openrc-run
 
@@ -79,14 +91,14 @@ start_pre() {
 
 start() {
     ebegin "Starting XrayS"
-    start-stop-daemon --start --make-pidfile --pidfile "${pidfile}" --background --exec "${command}" -- ${command_args}
-    eend $?
+    start-stop-daemon --start --make-pidfile --pidfile "\${pidfile}" --background --exec "\${command}" -- \${command_args}
+    eend \$?
 }
 
 stop() {
     ebegin "Stopping XrayS"
-    start-stop-daemon --stop --pidfile "${pidfile}"
-    eend $?
+    start-stop-daemon --stop --pidfile "\${pidfile}"
+    eend \$?
 }
 EOF
 
@@ -202,7 +214,7 @@ cat <<EOF > /etc/xrayS/config.json
 }
 EOF
 
-# 启动 XrayS 服务
+# 启动XrayS服务
 rc-service xrayS start || { print_error "启动 xrayS 服务失败"; exit 1; }
 
 # 保存信息到文件
