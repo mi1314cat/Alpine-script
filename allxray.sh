@@ -244,7 +244,7 @@ cat << EOF > /root/Xray/config.json
       }
     },
     {
-      "listen": "0.0.0.0",
+      "listen": "::",
       "port": ${reality_PORT},
       "protocol": "vless",
       "settings": {
