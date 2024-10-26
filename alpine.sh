@@ -4,7 +4,7 @@ printf "\e[92m"
 printf "                       |\\__/,|   (\\\\ \n"
 printf "                     _.|o o  |_   ) )\n"
 printf "       -------------(((---(((-------------------\n"
-printf "                    alpine-catmi \n"
+printf "                     catmi-alpine \n"
 printf "       -----------------------------------------\n"
 printf "\e[0m"
 apk add update
