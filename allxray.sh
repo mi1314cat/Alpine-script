@@ -353,19 +353,20 @@ echo "${share_link}" > /root/Xray/share-link.txt
 # 生成 Clash Meta 配置文件
 cat << EOF > /root/Xray/clash-meta.yaml
   - name: Reality
-  port:  ${reality_PORT}
-  server: "$IP"
-  type: vless
-  network: tcp
-  udp: true
-  servername: "$dest_server"
-  skip-cert-verify: true
-  reality-opts:
-    public-key: $(cat /usr/local/etc/xray/publickey)
-    short-id: $short_id
-  uuid: "$UUID"
-  flow: xtls-rprx-vision
-  client-fingerprint: chrome
+    port:  ${reality_PORT}
+    server: "$IP"
+    type: vless
+    network: tcp
+    udp: true
+    tls: true
+    servername: "$dest_server"
+    skip-cert-verify: true
+    reality-opts:
+      public-key: $(cat /usr/local/etc/xray/publickey)
+      short-id: $short_id
+    uuid: "$UUID"
+    flow: xtls-rprx-vision
+    client-fingerprint: chrome
 EOF
 
 # 保存信息到文件
@@ -393,6 +394,7 @@ print_info "socks5 账号：${SOCKS_USERNAME}"
 print_info "socks5 密码：${SOCKS_PASSWORD}"
 print_info "配置文件已保存到：/root/Xray"
 cat /root/Xray/share-link.txt
+/root/Xray/clash-meta.yaml
 # 启动服务
 rc-update add xrayR default
 service xrayR start
