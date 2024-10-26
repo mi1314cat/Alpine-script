@@ -329,12 +329,12 @@ IP=$(wget -qO- --no-check-certificate -U Mozilla https://api.ip.sb/geoip | sed -
 print_green "您的IP为：$IP"
 
 # 生成分享链接
-share_link="vless://$UUID@$IP:${reality_PORT}?encryption=none&flow=xtls-rprx-vision&security=reality&sni=$dest_server&fp=chrome&pbk=$public_key&sid=$short_id&type=tcp&headerType=none#Reality"
+share_link="vless://$UUID@$IP:${reality_PORT}?encryption=none&flow=xtls-rprx-vision&security=reality&sni=$dest_server&fp=chrome&pbk=$(cat /usr/local/etc/xray/privatekey)&sid=$short_id&type=tcp&headerType=none#Reality"
 echo "${share_link}" > /root/Xray/share-link.txt
 
 # 生成 Clash Meta 配置文件
 cat << EOF > /root/Xray/clash-meta.yaml
-  - name: "gfw"
+  - name: reality
     type: vless
     server: "$IP"
     port: ${reality_PORT}
