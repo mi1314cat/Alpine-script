@@ -362,7 +362,7 @@ mkdir -p "$OUTPUT_DIR"
     echo "socks5 端口：${SOCKS_PORT}"
     echo "socks5 账号：${SOCKS_USERNAME}"
     echo "socks5 密码：${SOCKS_PASSWORD}"
-    echo "配置文件已保存到：/root/Xray/config.json"
+   
 } > "$OUTPUT_DIR/xrayR.txt"
 
 print_info "xray 安装完成！"
@@ -373,8 +373,8 @@ print_info "vmess WS 路径：${WS_PATH}"
 print_info "socks5 端口：${SOCKS_PORT}"
 print_info "socks5 账号：${SOCKS_USERNAME}"
 print_info "socks5 密码：${SOCKS_PASSWORD}"
-print_info "配置文件已保存到：/root/Xray/config.json"
-
+print_info "配置文件已保存到：/root/Xray"
+cat /root/Xray/share-link.txt
 # 启动服务
 rc-update add xrayR default
 service xrayR start
