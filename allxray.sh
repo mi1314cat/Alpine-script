@@ -329,25 +329,25 @@ IP=$(wget -qO- --no-check-certificate -U Mozilla https://api.ip.sb/geoip | sed -
 print_green "您的IP为：$IP"
 
 # 生成分享链接
-share_link="vless://$UUID@$IP:${reality_PORT}?encryption=none&flow=xtls-rprx-vision&security=reality&sni=$dest_server&fp=chrome&pbk=$(cat /usr/local/etc/xray/privatekey)&sid=$short_id&type=tcp&headerType=none#Reality"
+share_link="vless://$UUID@$IP:${reality_PORT}?encryption=none&flow=xtls-rprx-vision&security=reality&sni=$dest_server&fp=chrome&pbk=$(cat /usr/local/etc/xray/publickey)&sid=$short_id&type=tcp&headerType=none#Reality"
 echo "${share_link}" > /root/Xray/share-link.txt
 
 # 生成 Clash Meta 配置文件
 cat << EOF > /root/Xray/clash-meta.yaml
-  - name: reality
-    type: vless
-    server: "$IP"
-    port: ${reality_PORT}
-    uuid: "$UUID"
-    alterId: 0
-    cipher: "none"
-    tls: true
-    skip-cert-verify: true
-    server-name: "$dest_server"
-    network: "tcp"
-    tcp-options:
-      type: "none"
-    udp: true
+  - name: Reality
+  port:  ${reality_PORT}
+  server: "$IP"
+  type: vless
+  network: tcp
+  udp: true
+  servername: "$dest_server"
+  skip-cert-verify: true
+  reality-opts:
+    public-key: $(cat /usr/local/etc/xray/publickey)
+    short-id: $short_id
+  uuid: "$UUID"
+  flow: xtls-rprx-vision
+  client-fingerprint: chrome
 EOF
 
 # 保存信息到文件
