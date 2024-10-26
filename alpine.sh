@@ -8,6 +8,7 @@ printf "                    alpine-catmi \n"
 printf "       -----------------------------------------\n"
 printf "\e[0m"
 apk add update
+apk add iproute2
 apk add wget bash curl sudo
 read -p "按回车继续执行第一个脚本..."
 clear
