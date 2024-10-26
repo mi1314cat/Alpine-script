@@ -363,7 +363,7 @@ mkdir -p "$OUTPUT_DIR"
     echo "socks5 端口：${SOCKS_PORT}"
     echo "socks5 账号：${SOCKS_USERNAME}"
     echo "socks5 密码：${SOCKS_PASSWORD}"
-    echo "配置文件已保存到：/root/xray/xrayS.txt"
+    echo "配置文件已保存到：/root/xray/xrayR.txt"
 } > "$OUTPUT_DIR/xrayS.txt"
 
 print_info "xray 安装完成！"
