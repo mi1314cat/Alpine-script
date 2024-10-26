@@ -49,15 +49,17 @@ generate_ws_path() {
     echo "/$(tr -dc 'a-zA-Z0-9' < /dev/urandom | head -c 10)"
 }
 
-# 安装xray
+# 安装 xray
 echo "安装最新 Xray..."
-apk add --no-cache curl bash || { print_error "安装curl和bash失败"; exit 1; }
-bash -c "$(curl -L https://github.com/XTLS/Xray-install/raw/main/install-release.sh)" @ install || { print_error "Xray 安装失败"; exit 1; }
-mv /usr/local/bin/xray /usr/local/bin/xrayS || { print_error "移动文件失败"; exit 1; }
+apk add --no-cache curl bash unzip || { print_error "安装依赖失败"; exit 1; }
+wget https://github.com/XTLS/Xray-core/releases/download/v1.9.1/Xray-linux-64.zip || { print_error "下载 Xray 失败"; exit 1; }
+unzip Xray-linux-64.zip || { print_error "解压 Xray 失败"; exit 1; }
+mv xray /usr/local/bin/xrayS || { print_error "移动文件失败"; exit 1; }
+rm -f Xray-linux-64.zip  # 清理下载的 zip 文件
 
 chmod +x /usr/local/bin/xrayS || { print_error "修改权限失败"; exit 1; }
 
-# 创建openrc服务
+# 创建 openrc 服务
 cat <<EOF >/etc/init.d/xrayS
 #!/sbin/openrc-run
 
@@ -200,7 +202,7 @@ cat <<EOF > /etc/xrayS/config.json
 }
 EOF
 
-# 启动XrayS服务
+# 启动 XrayS 服务
 rc-service xrayS start || { print_error "启动 xrayS 服务失败"; exit 1; }
 
 # 保存信息到文件
