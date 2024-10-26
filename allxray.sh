@@ -196,15 +196,13 @@ read -rp "请输入回落域名: " dest_server
 # 生成随机 ID
 short_id=$(dd bs=4 count=2 if=/dev/urandom | xxd -p -c 8)
 
-# 生成密钥
-keys=$(/usr/local/bin/xrayR x25519)
-private_key=$(echo "$keys" | awk '{print $3}' | tr -d '\n')  # 删除换行符
-public_key=$(echo "$keys" | awk '{print $6}' | tr -d '\n')   # 删除换行符
 
-# 输出密钥和 ID
-print_green "private_key: $private_key"
-print_green "public_key: $public_key"
-print_green "short_id: $short_id"
+keys=$(/usr/local/bin/xrayR x25519)
+private_key=$(echo "$keys" | awk '{print $3}')
+public_key=$(echo "$keys" | awk '{print $6}')
+green "private_key: $private_key"
+green "public_key: $public_key"
+green "short_id: $short_id"
 
 # 生成 Xray 配置文件
 rm -f /root/Xray/config.json
@@ -244,38 +242,38 @@ cat << EOF > /root/Xray/config.json
       }
     },
     {
-      "listen": "::",
-      "port": ${reality_PORT},
-      "protocol": "vless",
-      "settings": {
-        "clients": [
-          {
-            "id": "$UUID",
-            "flow": "xtls-rprx-vision"
+          "listen": "::",
+          "port": ${reality_PORT},
+          "protocol": "vless",
+          "settings": {
+              "clients": [
+                  {
+                      "id": "$UUID",
+                      "flow": "xtls-rprx-vision"
+                  }
+              ],
+              "decryption": "none"
+          },
+          "streamSettings": {
+              "network": "tcp",
+              "security": "reality",
+              "realitySettings": {
+                  "show": true,
+                  "dest": "$dest_server:443",
+                  "xver": 0,
+                  "serverNames": [
+                      "$dest_server"
+                  ],
+                  "privateKey": "$private_key",
+                  "minClientVer": "",
+                  "maxClientVer": "",
+                  "maxTimeDiff": 0,
+                  "shortIds": [
+                  "$short_id"
+                  ]
+              }
           }
-        ],
-        "decryption": "none"
-      },
-      "streamSettings": {
-        "network": "tcp",
-        "security": "reality",
-        "realitySettings": {
-          "show": true,
-          "dest": "$dest_server:443",
-          "xver": 0,
-          "serverNames": [
-            "$dest_server"
-          ],
-          "privateKey": "$private_key",
-          "minClientVer": "",
-          "maxClientVer": "",
-          "maxTimeDiff": 0,
-          "shortIds": [
-            "$short_id"
-          ]
-        }
       }
-    }
   ],
   "outbounds": [
     {
