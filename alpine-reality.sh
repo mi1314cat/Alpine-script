@@ -98,6 +98,7 @@ stop() {
     eend \$?
 }
 EOF
+chmod +x /etc/init.d/xrayR
 
 random_website() {
     domains=(
