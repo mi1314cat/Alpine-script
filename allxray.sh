@@ -148,33 +148,7 @@ random_website() {
 mkdir -p /root/Xray
 
 
-# 端口号输入及验证
-read -p "请输入reality端口号：" port
-sign=false
-until $sign; do
-    if [ -z "$port" ]; then
-        red "错误：端口号不能为空，请输入可用端口号!"
-        read -p "请重新输入reality端口号：" port
-        continue
-    fi
-    if ! echo "$port" | grep -qE '^[0-9]+$';then
-        red "错误：端口号必须是数字!"
-        read -p "请重新输入reality端口号：" port
-        continue
-    fi
-    if [ "$port" -lt 1 ] || [ "$port" -gt 65535 ]; then
-        red "错误：端口号必须介于1~65535之间!"
-        read -p "请重新输入reality端口号：" port
-        continue
-    fi
-    if ! nc -z 127.0.0.1 "$port" 2>/dev/null; then
-        green "成功：端口号 $port 可用!"
-        sign=true
-    else
-        red "错误：$port 已被占用！"
-        read -p "请重新输入reality端口号：" port
-    fi
-done
+
 
 
 # 生成随机端口
@@ -190,7 +164,7 @@ generate_random_port() {
         print_error "端口 $port 被占用，请输入其他端口"
     done
 }
-
+reality_PORT=$(generate_random_port "reality")
 SOCKS_PORT=$(generate_random_port "socks5")
 VMES_PORT=$(generate_random_port "vmess")
 
@@ -253,7 +227,7 @@ cat << EOF > /root/Xray/config.json
     },
     {
       "listen": "0.0.0.0",
-      "port": $port,
+      "port": ${reality_PORT},
       "protocol": "vless",
       "settings": {
         "clients": [
@@ -312,7 +286,7 @@ IP=$(wget -qO- --no-check-certificate -U Mozilla https://api.ip.sb/geoip | sed -
 print_green "您的IP为：$IP"
 
 # 生成分享链接
-share_link="vless://$UUID@$IP:$port?encryption=none&flow=xtls-rprx-vision&security=reality&sni=$dest_server&fp=chrome&pbk=$public_key&sid=$short_id&type=tcp&headerType=none#Reality"
+share_link="vless://$UUID@$IP:${reality_PORT}?encryption=none&flow=xtls-rprx-vision&security=reality&sni=$dest_server&fp=chrome&pbk=$public_key&sid=$short_id&type=tcp&headerType=none#Reality"
 echo "${share_link}" > /root/Xray/share-link.txt
 
 # 生成 Clash Meta 配置文件
@@ -348,7 +322,7 @@ proxies:
   - name: "gfw"
     type: vless
     server: "$IP"
-    port: $port
+    port: ${reality_PORT}
     uuid: "$UUID"
     alterId: 0
     cipher: "none"
