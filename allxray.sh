@@ -147,7 +147,16 @@ random_website() {
 # 确保配置目录存在
 mkdir -p /root/Xray
 
+# 随机生成 UUID
+generate_uuid() {
+    cat /proc/sys/kernel/random/uuid
+}
 
+# 随机生成 WS 路径
+generate_ws_path() {
+    echo "/$(tr -dc 'a-zA-Z0-9' < /dev/urandom | head -c 10)"
+}
+apk add iproute2
 
 
 
@@ -167,9 +176,18 @@ generate_random_port() {
 reality_PORT=$(generate_random_port "reality")
 SOCKS_PORT=$(generate_random_port "socks5")
 VMES_PORT=$(generate_random_port "vmess")
+# SOCKS 配置
+DEFAULT_SOCKS_USERNAME="userb"
+DEFAULT_SOCKS_PASSWORD="passwordb"
+read -p "SOCKS 账号 (默认 $DEFAULT_SOCKS_USERNAME): " SOCKS_USERNAME
+SOCKS_USERNAME=${SOCKS_USERNAME:-$DEFAULT_SOCKS_USERNAME}
+read -p "SOCKS 密码 (默认 $DEFAULT_SOCKS_PASSWORD): " SOCKS_PASSWORD
+SOCKS_PASSWORD=${SOCKS_PASSWORD:-$DEFAULT_SOCKS_PASSWORD}
+# 生成 UUID 和 WS 路径
+UUID=$(generate_uuid)
+WS_PATH=$(generate_ws_path)
 
-# 生成 UUID 和密钥
-UUID=$(cat /proc/sys/kernel/random/uuid)
+
 
 # 提示输入回落域名
 read -rp "请输入回落域名: " dest_server
