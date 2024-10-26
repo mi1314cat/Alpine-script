@@ -14,6 +14,10 @@ apk add curl && apk add bash && bash <(curl -fsSL https://github.com/mi1314cat/A
 ```bash
 apk add curl && apk add bash && bash <(curl -fsSL https://github.com/mi1314cat/Alpine-script/raw/refs/heads/main/alpine-reality.sh)
 ```
+#### uninstall-xray
+```bash
+apk add curl && apk add bash && bash <(curl -fsSL https://github.com/mi1314cat/Alpine-script/raw/refs/heads/main/uninstall-xray.sh)
+```
 ### vemss sock 
 ```bash
 apk add curl && apk add bash && bash <(curl -fsSL https://github.com/mi1314cat/Alpine-script/raw/refs/heads/main/Alpine-xray.sh)
