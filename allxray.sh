@@ -47,7 +47,7 @@ cat << "EOF"
                        |\__/,|   (\\
                      _.|o o  |_   ) )
        -------------(((---(((-------------------
-                    catmi.xrayS
+                    catmi.Alpine
        -----------------------------------------
 EOF
 echo -e "${GREEN}System: ${PLAIN}${SYSTEM_NAME}"
