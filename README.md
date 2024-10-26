@@ -4,7 +4,7 @@
 apk add curl && apk add bash && bash <(curl -fsSL https://github.com/mi1314cat/Alpine-script/raw/refs/heads/main/Alpine-xray.sh)
 ```
 
-## lpine-hysteria2 脚本
+## Alpine-hysteria2 脚本
 一键脚本
 ```bash
 apk add curl && apk add bash && bash <(curl -fsSL https://github.com/mi1314cat/Alpine-script/raw/refs/heads/main/alpine.sh)
