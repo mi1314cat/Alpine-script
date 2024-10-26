@@ -4,27 +4,37 @@
 RED="\033[31m"
 GREEN="\033[32m"
 YELLOW="\033[33m"
+BLUE="\033[34m"
 
 # 定义彩色输出函数
 print_color() {
-    printf "\033[3%sm$1\033[0m\n" "$2"
+    printf "\033[3%sm%s\033[0m\n" "$2" "$1"
 }
 
 print_red() {
-    print_color "red" "$1"
+    print_color "$1" "1"
 }
 
 print_green() {
-    print_color "green" "$1"
+    print_color "$1" "2"
 }
 
 print_yellow() {
-    print_color "yellow" "$1"
+    print_color "$1" "3"
+}
+
+print_blue() {
+    print_color "$1" "4"
 }
 
 # 定义错误输出函数
 print_error() {
     print_red "错误：$1"
+}
+
+# 定义信息输出函数
+print_info() {
+    print_green "信息：$1"
 }
 
 # 获取当前架构
@@ -146,6 +156,7 @@ random_website() {
 
 # 确保配置目录存在
 mkdir -p /root/Xray
+mkdir -p /usr/local/etc/xray
 
 # 随机生成 UUID
 generate_uuid() {
@@ -156,9 +167,6 @@ generate_uuid() {
 generate_ws_path() {
     echo "/$(tr -dc 'a-zA-Z0-9' < /dev/urandom | head -c 10)"
 }
-apk add iproute2
-
-
 
 # 生成随机端口
 generate_random_port() {
@@ -173,9 +181,11 @@ generate_random_port() {
         print_error "端口 $port 被占用，请输入其他端口"
     done
 }
+
 reality_PORT=$(generate_random_port "reality")
 SOCKS_PORT=$(generate_random_port "socks5")
 VMES_PORT=$(generate_random_port "vmess")
+
 # SOCKS 配置
 DEFAULT_SOCKS_USERNAME="userb"
 DEFAULT_SOCKS_PASSWORD="passwordb"
@@ -183,11 +193,10 @@ read -p "SOCKS 账号 (默认 $DEFAULT_SOCKS_USERNAME): " SOCKS_USERNAME
 SOCKS_USERNAME=${SOCKS_USERNAME:-$DEFAULT_SOCKS_USERNAME}
 read -p "SOCKS 密码 (默认 $DEFAULT_SOCKS_PASSWORD): " SOCKS_PASSWORD
 SOCKS_PASSWORD=${SOCKS_PASSWORD:-$DEFAULT_SOCKS_PASSWORD}
+
 # 生成 UUID 和 WS 路径
 UUID=$(generate_uuid)
 WS_PATH=$(generate_ws_path)
-
-
 
 # 提示输入回落域名
 read -rp "请输入回落域名: " dest_server
@@ -196,13 +205,31 @@ read -rp "请输入回落域名: " dest_server
 # 生成随机 ID
 short_id=$(dd bs=4 count=2 if=/dev/urandom | xxd -p -c 8)
 
+getkey() {
+    echo "正在生成私钥和公钥，请妥善保管好..."
+    mkdir -p /usr/local/etc/xray
 
-keys=$(/usr/local/bin/xrayR x25519)
-private_key=$(echo "$keys" | awk '{print $3}' | tr -d '\n')  # 删除换行符
-public_key=$(echo "$keys" | awk '{print $6}' | tr -d '\n')   # 删除换行符
-green "private_key: $private_key"
-green "public_key: $public_key"
-green "short_id: $short_id"
+    # 生成密钥并保存到文件
+    /usr/local/bin/xrayR x25519 > /usr/local/etc/xray/key || {
+        print_error "生成密钥失败"
+        return 1
+    }
+
+    # 提取私钥和公钥
+    private_key=$(awk 'NR==1 {print $3}' /usr/local/etc/xray/key)
+    public_key=$(awk 'NR==2 {print $3}' /usr/local/etc/xray/key)
+
+    # 保存密钥到文件
+    echo "$private_key" > /usr/local/etc/xray/privatekey
+    echo "$public_key" > /usr/local/etc/xray/publickey
+
+    # 输出密钥
+    KEY=$(cat /usr/local/etc/xray/key)
+    print_blue "$KEY"
+
+    echo ""
+}
+getkey
 
 # 生成 Xray 配置文件
 rm -f /root/Xray/config.json
@@ -264,7 +291,7 @@ cat << EOF > /root/Xray/config.json
                   "serverNames": [
                       "$dest_server"
                   ],
-                  "privateKey": "$private_key",
+                  "privateKey": "$(cat /usr/local/etc/xray/privatekey)",
                   "minClientVer": "",
                   "maxClientVer": "",
                   "maxTimeDiff": 0,
@@ -307,7 +334,6 @@ echo "${share_link}" > /root/Xray/share-link.txt
 
 # 生成 Clash Meta 配置文件
 cat << EOF > /root/Xray/clash-meta.yaml
-
   - name: "gfw"
     type: vless
     server: "$IP"
@@ -322,32 +348,33 @@ cat << EOF > /root/Xray/clash-meta.yaml
     tcp-options:
       type: "none"
     udp: true
-    # 这里可以添加其他的设置...
 EOF
+
 # 保存信息到文件
 OUTPUT_DIR="/root/xray"
 mkdir -p "$OUTPUT_DIR"
 {
     echo "xray 安装完成！"
-    echo "服务器地址：${PUBLIC_IP}"
+    echo "服务器地址：${IP}"
     echo "vmess 端口：${VMES_PORT}"
     echo "vmess UUID：${UUID}"
     echo "vmess WS 路径：${WS_PATH}"
     echo "socks5 端口：${SOCKS_PORT}"
     echo "socks5 账号：${SOCKS_USERNAME}"
     echo "socks5 密码：${SOCKS_PASSWORD}"
-    echo "配置文件已保存到：/root/xray/xrayR.txt"
+    echo "配置文件已保存到：/root/Xray/config.json"
 } > "$OUTPUT_DIR/xrayR.txt"
 
 print_info "xray 安装完成！"
-print_info "服务器地址：${PUBLIC_IP}"
+print_info "服务器地址：${IP}"
 print_info "vmess 端口：${VMES_PORT}"
 print_info "vmess UUID：${UUID}"
 print_info "vmess WS 路径：${WS_PATH}"
 print_info "socks5 端口：${SOCKS_PORT}"
 print_info "socks5 账号：${SOCKS_USERNAME}"
 print_info "socks5 密码：${SOCKS_PASSWORD}"
-print_info "配置文件已保存到：/root/xray"
+print_info "配置文件已保存到：/root/Xray/config.json"
+
 # 启动服务
 rc-update add xrayR default
 service xrayR start
