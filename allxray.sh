@@ -198,8 +198,8 @@ short_id=$(dd bs=4 count=2 if=/dev/urandom | xxd -p -c 8)
 
 
 keys=$(/usr/local/bin/xrayR x25519)
-private_key=$(echo "$keys" | awk '{print $3}')
-public_key=$(echo "$keys" | awk '{print $6}')
+private_key=$(echo "$keys" | awk '{print $3}' | tr -d '\n')  # 删除换行符
+public_key=$(echo "$keys" | awk '{print $6}' | tr -d '\n')   # 删除换行符
 green "private_key: $private_key"
 green "public_key: $public_key"
 green "short_id: $short_id"
