@@ -17,7 +17,7 @@ apk add curl && apk add bash && bash <(curl -fsSL https://github.com/mi1314cat/A
 ```
 #### uninstall-xray
 ```bash
-      bash <(curl -fsSL https://github.com/mi1314cat/Alpine-script/raw/refs/heads/main/uninstall-xray.sh)
+bash <(curl -fsSL https://github.com/mi1314cat/Alpine-script/raw/refs/heads/main/uninstall-xray.sh)
 ```
 ### vemss sock 
 ```bash
@@ -25,7 +25,7 @@ apk add curl && apk add bash && bash <(curl -fsSL https://github.com/mi1314cat/A
 ```
 ## ac证书
  ```bash
-bash <(curl -fsSL https://github.com/mi1314cat/Alpine-script/raw/refs/heads/main/acme.sh)
+apk add curl && apk add bash && bash <(curl -fsSL https://github.com/mi1314cat/Alpine-script/raw/refs/heads/main/acme.sh)
 ```
 ## Alpine-hysteria2 脚本
 
