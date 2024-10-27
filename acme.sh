@@ -88,6 +88,20 @@ elif [ "$choice" -eq 2 ]; then
     mv "/etc/letsencrypt/live/$DOMAIN/privkey.pem" "$TARGET_DIR/privkey.pem"
 
     echo "SSL 证书已安装并移动至 $TARGET_DIR 目录中"
+
+    # 创建自动续期的脚本
+    cat << EOF > /root/renew_cert.sh
+#!/bin/sh
+certbot renew --quiet --deploy-hook "mv /etc/letsencrypt/live/$DOMAIN/fullchain.pem $TARGET_DIR/fullchain.pem" \
+--deploy-hook "mv /etc/letsencrypt/live/$DOMAIN/privkey.pem $TARGET_DIR/privkey.pem"
+EOF
+    chmod +x /root/renew_cert.sh
+
+    # 创建自动续期的 cron 任务，每天午夜执行一次
+    (crontab -l 2>/dev/null; echo "0 0 * * * /root/renew_cert.sh > /dev/null 2>&1") | crontab -
+
+    echo "自动续期功能已设置，证书将在到期前自动续期。"
+
 else
     echo "无效选项，请输入 1 或 2."
 fi
