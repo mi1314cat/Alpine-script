@@ -25,8 +25,9 @@ if [ "$choice" -eq 1 ]; then
     # 更新系统并安装必要的依赖项
     echo "更新系统并安装依赖项..."
     apk update && apk upgrade
+    apk add ufw
     apk add --no-cache curl socat git bash openssl
-
+    ufw disable
     # 安装 acme.sh
     echo "安装 acme.sh..."
     curl https://get.acme.sh | sh
