@@ -3,6 +3,7 @@
 ```bash
 apk add curl && apk add bash && bash <(curl -fsSL https://cfgithub.gw2333.workers.dev/https://github.com/mi1314cat/Alpine-script/raw/refs/heads/main/alpine.sh)
 ```
+
 ## Alpine-xary 
 ### reality VEMSS SOCK5 三合一
 ```bash
@@ -22,7 +23,10 @@ bash <(curl -fsSL https://github.com/mi1314cat/Alpine-script/raw/refs/heads/main
 ```bash
 apk add curl && apk add bash && bash <(curl -fsSL https://github.com/mi1314cat/Alpine-script/raw/refs/heads/main/Alpine-xray.sh)
 ```
-
+## ac证书
+ ```bash
+bash <(curl -fsSL https://github.com/mi1314cat/Alpine-script/raw/refs/heads/main/acme.sh)
+```
 ## Alpine-hysteria2 脚本
 
 ### 一键安装
