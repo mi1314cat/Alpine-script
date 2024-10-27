@@ -23,6 +23,10 @@ bash <(curl -fsSL https://github.com/mi1314cat/Alpine-script/raw/refs/heads/main
 ```bash
 apk add curl && apk add bash && bash <(curl -fsSL https://github.com/mi1314cat/Alpine-script/raw/refs/heads/main/Alpine-xray.sh)
 ```
+## Alpine-bbr
+```bash
+bash <(curl -fsSL https://github.com/mi1314cat/Alpine-script/raw/refs/heads/main/bbr.sh)
+```
 ## ac证书
  ```bash
 apk add curl && apk add bash && bash <(curl -fsSL https://github.com/mi1314cat/Alpine-script/raw/refs/heads/main/acme.sh)
