@@ -27,6 +27,7 @@ fi
 read -p "按回车继续执行安装安装xray（输入n跳过）..." input
 if [[ "$input" != "n" ]]; then
     clear
+    bash <(curl -fsSL https://github.com/mi1314cat/Alpine-script/raw/refs/heads/main/bbr.sh)
    bash <(curl -fsSL https://github.com/mi1314cat/Alpine-script/raw/refs/heads/main/allxray.sh)
 
 
