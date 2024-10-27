@@ -10,10 +10,10 @@ if [ "$choice" -eq 1 ]; then
     # 选项 1: 安装更新、克隆仓库并执行脚本
     echo "执行安装更新、克隆仓库并运行 acme_2.0.sh 脚本..."
     apk update
-    apk add git
-    git clone https://github.com/slobys/SSL-Renewal.git /tmp/acme
-    mv /tmp/acme/* /root
-    sh /root/acme_2.0.sh
+    apk add curl
+    curl -o /tmp/alpine-ssh.sh https://github.com/mi1314cat/SSL-Renewal/raw/refs/heads/main/alpine-ssh.sh
+    chmod +x /tmp/alpine-ssh.sh
+    sh /tmp/alpine-ssh.sh
 
 elif [ "$choice" -eq 2 ]; then
     # 选项 2: 手动获取 SSL 证书并移动到 /catmi 文件夹
