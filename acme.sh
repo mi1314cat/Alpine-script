@@ -84,8 +84,8 @@ elif [ "$choice" -eq 2 ]; then
 
     # 移动生成的证书到目标文件夹中
     echo "移动证书到 $TARGET_DIR ..."
-    mv "/etc/letsencrypt/live/$DOMAIN/fullchain.pem" "$TARGET_DIR/fullchain.pem"
-    mv "/etc/letsencrypt/live/$DOMAIN/privkey.pem" "$TARGET_DIR/privkey.pem"
+    mv "/etc/letsencrypt/live/$DOMAIN/fullchain.pem" "$TARGET_DIR/"
+    mv "/etc/letsencrypt/live/$DOMAIN/privkey.pem" "$TARGET_DIR/"
 
     echo "SSL 证书已安装并移动至 $TARGET_DIR 目录中"
 
