@@ -1,13 +1,14 @@
 # Alpine-script
-```bash
- bash <(curl -fsSL https://cfgithub.gw2333.workers.dev/https://github.com/mi1314cat/Alpine-script/raw/refs/heads/main/sing-box.sh)
-```
+
 
 ## 一键脚本
 ```bash
 apk add curl && apk add bash && bash <(curl -fsSL https://cfgithub.gw2333.workers.dev/https://github.com/mi1314cat/Alpine-script/raw/refs/heads/main/alpine.sh)
 ```
-
+## sing-box max 多协议选择
+```bash
+bash <(curl -fsSL https://github.com/mi1314cat/sing-box-max/raw/refs/heads/main/sing-box.sh)
+```
 ## Alpine-xary 
 ### reality VEMSS SOCK5 三合一
 ```bash
