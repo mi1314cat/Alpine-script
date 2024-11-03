@@ -116,7 +116,7 @@ rc-update add sing-box default
 # 生成随机域名
 random_website() {
     domains=( 
-        "one-piece.com"
+       "one-piece.com"
         "lovelive-anime.jp"
         "swift.com"
         "academy.nvidia.com"
@@ -147,7 +147,8 @@ random_website() {
         "aod.itunes.apple.com"
         "www.google-analytics.com"
         "dl.google.com"
-        )  # 这里可以添加更多域名
+        # 您可以根据需要添加更多域名
+    )
     total_domains=${#domains[@]}
     random_index=$((RANDOM % total_domains))
     echo "${domains[$random_index]}"
@@ -158,12 +159,15 @@ short_id=$(dd bs=4 count=2 if=/dev/urandom | xxd -p -c 8)
 
 # 提示输入监听端口号
 reality_PORT=$(generate_port "vless-reality")
+hysteria2_PORT=$(generate_port "hysteria2")
+
 # 提示输入回落域名
 read -rp "请输入回落域名(回车随机生成): " dest_server
 dest_server=${dest_server:-$(random_website)}
 
 # 生成 UUID
 reality_UUID=$(generate_uuid)
+
 # 生成密钥并保存输出
 output=$(sing-box generate reality-keypair)
 
@@ -231,6 +235,27 @@ cat << EOF > "$CONFIG_DIR/config.json"
           ]
         }
       }
+    },
+    {
+      "sniff": true,
+      "sniff_override_destination": true,
+      "type": "hysteria2",
+      "tag": "hy2-in",
+      "listen": "::",
+      "listen_port": $hysteria2_PORT,
+      "users": [
+        {
+          "password": "$AUTH_PASSWORD"
+        }
+      ],
+      "tls": {
+        "enabled": true,
+        "alpn": [
+          "h3"
+        ],
+        "certificate_path": "$TARGET_DIR/server.crt",
+        "key_path": "$TARGET_DIR/server.key"
+      }
     }
   ],
   "outbounds": [
@@ -267,6 +292,17 @@ cat << EOF > "$TARGET_DIR/config.yaml"
       short-id: $short_id
     uuid: "$reality_UUID"
     flow: xtls-rprx-vision
+
+  - name: SING-Hysteria2
+    server: $PUBLIC_IP
+    port: $hysteria2_PORT
+    type: hysteria2
+    network: tcp
+    tls: true
+    servername: $dest_server
+    udp: true
+    skip-cert-verify: true
+    password: "$AUTH_PASSWORD"
 EOF
 
 # 显示生成的密码
