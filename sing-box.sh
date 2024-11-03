@@ -20,7 +20,9 @@ print_with_delay() {
 }
 
 TARGET_DIR="/root/sing-box"
+CONFIG_DIR="/etc/sing-box"
 mkdir -p "$TARGET_DIR"
+mkdir -p "$CONFIG_DIR"  # 确保配置目录存在
 
 # 生成端口的函数
 generate_port() {
@@ -173,7 +175,7 @@ echo "使用的公网 IP 地址: $PUBLIC_IP"
 
 # 创建sing-box 服务端配置文件
 print_with_delay "生成 sing-box 配置文件..." 0.03
-cat << EOF > /etc/sing-box/config.json
+cat << EOF > $CONFIG_DIR/config.json
 {
   "log": {
     "disabled": false,
@@ -246,26 +248,21 @@ cat << EOF > /etc/sing-box/config.json
 }
 EOF
 
-# 生成服务文件
-cat << EOF > /etc/init.d/sing-box
+# 创建启动服务的脚本
+cat << 'EOF' > /etc/init.d/sing-box
 #!/sbin/openrc-run
-
 command="/usr/local/bin/sing-box"
-command_args="run -c /etc/sing-box/config.json"
 pidfile="/run/sing-box.pid"
 name="sing-box"
+command_args="run"
 
 depend() {
     need net
 }
 
-start_pre() {
-    checkpath --directory /run/sing-box
-}
-
 start() {
     ebegin "Starting $name"
-    start-stop-daemon --start --background --make-pidfile --pidfile \$pidfile --user root -- \$command \$command_args
+    start-stop-daemon --start --make-pidfile --pidfile \$pidfile --user root -- \$command \$command_args
     eend \$?
 }
 
@@ -298,7 +295,7 @@ cat << EOF > $TARGET_DIR/config.yaml
     alpn:
       - h3
   - name: SING-Reality
-    port: $reality_PORT
+    port:  $reality_PORT
     server: $PUBLIC_IP
     type: vless
     network: tcp
@@ -316,7 +313,7 @@ EOF
 
 # 显示生成的密码
 print_with_delay "sing-box 安装和配置完成！" 0.03
-print_with_delay "服务端配置文件已保存到 /etc/sing-box/config.json" 0.03
+print_with_delay "服务端配置文件已保存到 $CONFIG_DIR/config.json" 0.03
 print_with_delay "客户端配置文件已保存到 $TARGET_DIR/config.yaml" 0.03
 
 # 显示 sing-box 服务状态
