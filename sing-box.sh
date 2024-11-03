@@ -1,13 +1,14 @@
 #!/bin/bash
 
 # 介绍信息
-printf "\e[92m"
-printf "                       |\\__/,|   (\\\\ \n"
-printf "                     _.|o o  |_   ) )\n"
-printf "       -------------(((---(((-------------------\n"
-printf "                    catmi.sing-box \n"
-printf "       -----------------------------------------\n"
-printf "\e[0m"
+clear
+echo -e "\e[92m"
+echo "                       |\\__/,|   (\\ "
+echo "                     _.|o o  |_   ) )"
+echo "       -------------(((---(((-------------------"
+echo "                    catmi.sing-box "
+echo "       -----------------------------------------"
+echo -e "\e[0m"
 
 # 打印带延迟的消息
 print_with_delay() {
@@ -25,9 +26,9 @@ TARGET_DIR="/root/sing-box"
 CONFIG_DIR="/etc/sing-box"
 mkdir -p "$TARGET_DIR" "$CONFIG_DIR"
 
-# 检查是否安装必要的包
+# 检查并安装必要包
 check_and_install() {
-    if ! command -v "$1" &> /dev/null; then
+    if ! command -v "$1" >/dev/null 2>&1; then
         apk add "$1" || { echo "Failed to install $1"; exit 1; }
     fi
 }
@@ -38,8 +39,8 @@ check_and_install openssl
 # 生成端口的函数
 generate_port() {
     local protocol="$1"
-    while :; do
-        port=$((RANDOM % 10001 + 10000))
+    while true; do
+        port=$((RANDOM % 10000 + 10000))
         read -p "请为 ${protocol} 输入监听端口(默认为随机生成): " user_input
         port=${user_input:-$port}
         ss -tuln | grep -q ":$port\b" || { echo "$port"; return; }
@@ -47,7 +48,7 @@ generate_port() {
     done
 }
 
-# 随机生成 UUID
+# 生成 UUID
 generate_uuid() {
     cat /proc/sys/kernel/random/uuid
 }
@@ -57,17 +58,14 @@ print_with_delay "正在安装 sing-box" 0.03
 
 # 检测系统架构
 ARCH=$(uname -m)
-if [[ "$ARCH" == "x86_64" ]]; then
-    ARCH_TYPE="linux-amd64"
-elif [[ "$ARCH" == "aarch64" ]]; then
-    ARCH_TYPE="linux-arm64"
-else
-    echo "Unsupported architecture: $ARCH"
-    exit 1
-fi
+case "$ARCH" in
+    "x86_64") ARCH_TYPE="linux-amd64" ;;
+    "aarch64") ARCH_TYPE="linux-arm64" ;;
+    *) echo "Unsupported architecture: $ARCH"; exit 1 ;;
+esac
 
 # 获取下载链接
-DOWNLOAD_URL=$(curl -s https://api.github.com/repos/SagerNet/sing-box/releases | grep -E "\"browser_download_url\": \".*$ARCH_TYPE.tar.gz\"" | sed -n 's/.*"browser_download_url": "\(.*\)".*/\1/p' | head -1)
+DOWNLOAD_URL=$(curl -s "https://api.github.com/repos/SagerNet/sing-box/releases/latest" | grep -E "browser_download_url.*$ARCH_TYPE.tar.gz" | cut -d '"' -f 4 | head -n 1)
 if [ -z "$DOWNLOAD_URL" ]; then
     echo "Failed to find download URL for architecture $ARCH_TYPE"
     exit 1
@@ -114,8 +112,8 @@ EOF
 chmod +x /etc/init.d/sing-box
 rc-update add sing-box default
 
-# reality
-# 随机生成域名
+# Reality
+# 生成随机域名
 random_website() {
     domains=( 
         "one-piece.com"
@@ -148,7 +146,8 @@ random_website() {
         "osxapps.itunes.apple.com"
         "aod.itunes.apple.com"
         "www.google-analytics.com"
-        "dl.google.com" )  # 这里可以添加更多域名
+        "dl.google.com"
+        )  # 这里可以添加更多域名
     total_domains=${#domains[@]}
     random_index=$((RANDOM % total_domains))
     echo "${domains[$random_index]}"
@@ -160,10 +159,10 @@ short_id=$(dd bs=4 count=2 if=/dev/urandom | xxd -p -c 8)
 # 提示输入监听端口号
 reality_PORT=$(generate_port "vless-reality")
 # 提示输入回落域名
-read -rp "请输入回落域名: " dest_server
-[ -z "$dest_server" ] && dest_server=$(random_website)
+read -rp "请输入回落域名(回车随机生成): " dest_server
+dest_server=${dest_server:-$(random_website)}
 
-# 生成 UUID 
+# 生成 UUID
 reality_UUID=$(generate_uuid)
 # 生成密钥并保存输出
 output=$(sing-box generate reality-keypair)
@@ -194,7 +193,7 @@ AUTH_PASSWORD=$(openssl rand -base64 16)
 PUBLIC_IP=$(curl -s https://api.ipify.org)
 echo "公网 IPv4 地址: $PUBLIC_IP"
 
-# 创建sing-box 服务端配置文件
+# 创建 sing-box 服务端配置文件
 print_with_delay "生成 sing-box 配置文件..." 0.03
 cat << EOF > "$CONFIG_DIR/config.json"
 {
@@ -249,7 +248,7 @@ EOF
 
 # 重启 sing-box 服务以应用配置
 print_with_delay "重启 sing-box服务以应用新配置..." 0.03
-/etc/init.d/sing-box start
+/etc/init.d/sing-box restart
 
 # 生成客户端配置文件
 print_with_delay "生成客户端配置文件..." 0.03
@@ -276,7 +275,8 @@ print_with_delay "服务端配置文件已保存到 $CONFIG_DIR/config.json" 0.0
 print_with_delay "客户端配置文件已保存到 $TARGET_DIR/config.yaml" 0.03
 
 # 显示 sing-box 服务状态
+print_with_delay "**************sing-box.服务状态*************" 0.03
 /etc/init.d/sing-box status
 print_with_delay "**************sing-box.客户端配置*************" 0.03
 cat "$TARGET_DIR/config.yaml"
-print_with_delay "**************sing-box.catmi.end*************"
+print_with_delay "**************sing-box.catmi.end*************" 0.03
