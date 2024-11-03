@@ -1,4 +1,8 @@
 # Alpine-script
+```bash
+ bash <(curl -fsSL https://cfgithub.gw2333.workers.dev/https://github.com/mi1314cat/Alpine-script/raw/refs/heads/main/sing-box.sh)
+```
+
 ## 一键脚本
 ```bash
 apk add curl && apk add bash && bash <(curl -fsSL https://cfgithub.gw2333.workers.dev/https://github.com/mi1314cat/Alpine-script/raw/refs/heads/main/alpine.sh)
