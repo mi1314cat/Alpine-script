@@ -76,33 +76,39 @@ fi
 # 下载并安装
 echo "Downloading from: $DOWNLOAD_URL"
 curl -Lo sing-box.tar.gz "$DOWNLOAD_URL" || { echo "Download failed"; exit 1; }
-tar -xzf sing-box.tar.gz && mv sing-box-*/sing-box /usr/local/bin/ && rm -r sing-box.tar.gz sing-box-* 
+tar -xzf sing-box.tar.gz && mv sing-box-*/sing-box /usr/local/bin/ && rm -r sing-box.tar.gz sing-box-*
 chmod +x /usr/local/bin/sing-box
 echo "Installation complete"
 
 # 创建启动服务的脚本
 cat << 'EOF' > /etc/init.d/sing-box
 #!/sbin/openrc-run
+
 command="/usr/local/bin/sing-box"
+command_args="--config /etc/sing-box/config.json"
 pidfile="/run/sing-box.pid"
-name="sing-box"
-command_args="run"
 
 depend() {
     need net
+    after firewall
+}
+
+start_pre() {
+    checkpath --directory --mode 0755 /run/sing-box
 }
 
 start() {
-    ebegin "Starting $name"
-    start-stop-daemon --start --make-pidfile --pidfile \$pidfile --user root -- \$command \$command_args
-    eend \$?
+    ebegin "Starting sing-box"
+    start-stop-daemon --start --quiet --pidfile "$pidfile" --exec "$command" --background -- $command_args
+    eend $?
 }
 
 stop() {
-    ebegin "Stopping $name"
-    start-stop-daemon --stop --pidfile \$pidfile
-    eend \$?
+    ebegin "Stopping sing-box"
+    start-stop-daemon --stop --quiet --pidfile "$pidfile"
+    eend $?
 }
+
 EOF
 
 chmod +x /etc/init.d/sing-box
@@ -111,7 +117,38 @@ rc-update add sing-box default
 # reality
 # 随机生成域名
 random_website() {
-    domains=( "example.com" "test.com" "demo.com" )  # 这里可以添加更多域名
+    domains=( 
+        "one-piece.com"
+        "lovelive-anime.jp"
+        "swift.com"
+        "academy.nvidia.com"
+        "cisco.com"
+        "amd.com"
+        "apple.com"
+        "music.apple.com"
+        "amazon.com"
+        "fandom.com"
+        "tidal.com"
+        "zoro.to"
+        "pixiv.co.jp"
+        "mora.jp"
+        "j-wave.co.jp"
+        "dmm.com"
+        "booth.pm"
+        "ivi.tv"
+        "leercapitulo.com"
+        "sky.com"
+        "itunes.apple.com"
+        "download-installer.cdn.mozilla.net"
+        "images-na.ssl-images-amazon.com"
+        "swdist.apple.com"
+        "swcdn.apple.com"
+        "updates.cdn-apple.com"
+        "mensura.cdn-apple.com"
+        "osxapps.itunes.apple.com"
+        "aod.itunes.apple.com"
+        "www.google-analytics.com"
+        "dl.google.com" )  # 这里可以添加更多域名
     total_domains=${#domains[@]}
     random_index=$((RANDOM % total_domains))
     echo "${domains[$random_index]}"
