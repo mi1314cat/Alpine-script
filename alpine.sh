@@ -32,7 +32,7 @@ if [[ "$input" != "n" ]]; then
 
 
 fi
-read -p "按回车继续执行安装安装xray（输入n跳过）..." input
+read -p "按回车继续执行安装安装sing-box（输入n跳过）..." input
 if [[ "$input" != "n" ]]; then
     clear
     bash <(curl -fsSL https://github.com/mi1314cat/sing-box-max/raw/refs/heads/main/sing-box.sh)
