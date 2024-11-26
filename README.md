@@ -6,8 +6,13 @@
 apk add curl && apk add bash && bash <(curl -fsSL https://cfgithub.gw2333.workers.dev/https://github.com/mi1314cat/Alpine-script/raw/refs/heads/main/alpine.sh)
 ```
 ## vless+ws 域名
+### v4
 ```bash
 bash <(curl -fsSL https://github.com/mi1314cat/Alpine-script/raw/refs/heads/main/Avless.sh)
+```
+### v6
+```bash
+bash <(curl -fsSL https://github.com/mi1314cat/Alpine-script/raw/refs/heads/main/A6vless.sh)
 ```
 ## sing-box max 多协议选择
 ```bash
