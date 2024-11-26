@@ -263,6 +263,7 @@ http {
 
     server {
         listen ${VMES_PORT} ssl;
+        listen [::]:${VMES_PORT} ssl;
         server_name ${DOMAIN_LOWER};
 
         ssl_certificate       "${CERT_PATH}";
