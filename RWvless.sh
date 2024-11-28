@@ -518,6 +518,32 @@ EOF
 
 # 启动XrayS服务
 rc-service xrayS start || { print_error "启动 xrayS 服务失败"; exit 1; }
+IP=$(wget -qO- --no-check-certificate -U Mozilla https://api.ip.sb/geoip | sed -n 's/.*"ip": *"\([^"]*\).*/\1/p')
+green "您的IP为：$IP"
+
+# 生成分享链接
+share_link="vless://$UUID@$IP:$port?encryption=none&flow=xtls-rprx-vision&security=reality&sni=$dest_server&fp=chrome&pbk=$(cat /usr/local/etc/xray/publickey)&sid=$short_id&type=tcp&headerType=none#Reality"
+echo "${share_link}" > /root/Xray/share-link.txt
+
+# 生成 Clash Meta 配置文件
+cat << EOF > /root/Xray/clash-meta.yaml
+- name: Reality
+  port:  $port
+  server: "$IP"
+  type: vless
+  network: tcp
+  udp: true
+  tls: true
+  servername: "$dest_server"
+  skip-cert-verify: true
+  reality-opts:
+    public-key: $(cat /usr/local/etc/xray/publickey)
+    short-id: $short_id
+  uuid: "$UUID"
+  flow: xtls-rprx-vision
+  client-fingerprint: chrome
+EOF
+
 
 # 保存信息到文件
 OUTPUT_DIR="/root/xray"
@@ -529,7 +555,7 @@ mkdir -p "$OUTPUT_DIR"
     echo "vless UUID：${UUID}"
     echo "vless WS 路径：${WS_PATH}"
     
-    echo "配置文件已保存到：/root/xray/xrayS.txt"
+    echo "配置文件已保存到：/root/xray"
 } > "$OUTPUT_DIR/xrayS.txt"
 
 print_info "xray 安装完成！"
@@ -538,6 +564,8 @@ print_info "vless 端口：${VMES_PORT}"
 print_info "vless UUID：${UUID}"
 print_info "vless WS 路径：${WS_PATH}"
 print_info "配置文件已保存到：/root/xray/xrayS.txt"
-
+cat /root/Xray/share-link.txt
+cat /root/Xray/clash-meta.yaml
+cat /root/xray/xrayS.txt
 rc-service xrayS status
 nginx
