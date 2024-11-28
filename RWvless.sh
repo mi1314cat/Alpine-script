@@ -502,7 +502,7 @@ cat <<EOF > /etc/xrayS/config.json
           }
       }
   ],
-    ],
+    
     "outbounds": [
         {
             "protocol": "freedom",
