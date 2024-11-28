@@ -385,7 +385,7 @@ getkey() {
     mkdir -p /usr/local/etc/xray
 
     # 生成密钥并保存到文件
-    /usr/local/bin/xrayR x25519 > /usr/local/etc/xray/key || {
+    /usr/local/bin/xrayS x25519 > /usr/local/etc/xray/key || {
         print_error "生成密钥失败"
         return 1
     }
