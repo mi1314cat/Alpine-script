@@ -1,42 +1,118 @@
 #!/bin/bash
-# 介绍信息
-printf "\e[92m"
-printf "                       |\\__/,|   (\\\\ \n"
-printf "                     _.|o o  |_   ) )\n"
-printf "       -------------(((---(((-------------------\n"
-printf "                     catmi-alpine \n"
-printf "       -----------------------------------------\n"
-printf "\e[0m"
-apk add update
-apk add iproute2
-apk add wget bash curl sudo
-# 按回车继续执行安装kejilion工具箱脚本
-read -p "按回车继续执行安装kejilion工具箱脚本（输入n跳过）..." input
-if [[ "$input" != "n" ]]; then
+
+# 基础依赖检查和安装
+initialize_dependencies() {
+    echo "检查并安装基础依赖..."
+    apk update && apk add iproute2 wget bash curl sudo || { echo "依赖安装失败，请检查网络环境！"; exit 1; }
+    echo "基础依赖安装完成。"
+}
+
+# 创建面板函数
+main_menu() {
     clear
-    curl -sS -O https://raw.githubusercontent.com/kejilion/sh/main/kejilion.sh && chmod +x kejilion.sh && ./kejilion.sh
-fi
-# 添加回车等待
-# 按回车继续执行安装hysteria2
-read -p "按回车继续执行安装alpine-hysteria2（输入n跳过）..." input
-if [[ "$input" != "n" ]]; then
-    clear
-   bash <(curl -fsSL https://github.com/mi1314cat/Alpine-script/raw/refs/heads/main/alpine-hysteria2.sh)
-fi
+    echo -e "\e[92m"
+    echo "================================================="
+    echo "                   Catmi Alpine 面板            "
+    echo "================================================="
+    echo -e "\e[0m"
+    echo "1) 安装 Kejilion 工具箱"
+    echo "2) 安装 Alpine-Hysteria2"
+    echo "3) 安装 Xray 和 BBR 优化"
+    echo "4) 安装 Sing-box"
+    echo "5) 安装 VLESS（选择 IPv4 或 IPv6）"
+    echo "6) 退出面板"
+    echo
+    echo -n "请选择操作: "
+    read choice
 
-read -p "按回车继续执行安装安装xray（输入n跳过）..." input
-if [[ "$input" != "n" ]]; then
-    clear
-    bash <(curl -fsSL https://github.com/mi1314cat/Alpine-script/raw/refs/heads/main/bbr.sh)
-   bash <(curl -fsSL https://github.com/mi1314cat/Alpine-script/raw/refs/heads/main/allxray.sh)
+    case $choice in
+        1) install_toolbox ;;
+        2) install_hysteria ;;
+        3) install_xray ;;
+        4) install_singbox ;;
+        5) install_vless ;;
+        6) exit_program ;;
+        *) 
+            echo "无效选项，请重新选择。"
+            read -p "按回车返回主菜单..."
+            main_menu
+            ;;
+    esac
+}
 
+# 安装工具函数
+install_toolbox() {
+    echo "开始安装 Kejilion 工具箱..."
+    curl -sS -O https://raw.githubusercontent.com/kejilion/sh/main/kejilion.sh || { echo "工具箱下载失败"; return; }
+    chmod +x kejilion.sh && ./kejilion.sh
+    read -p "安装完成，按回车返回主菜单..."
+    main_menu
+}
 
-fi
-read -p "按回车继续执行安装安装sing-box（输入n跳过）..." input
-if [[ "$input" != "n" ]]; then
-    clear
-    bash <(curl -fsSL https://github.com/mi1314cat/sing-box-max/raw/refs/heads/main/sing-box.sh)
+install_hysteria() {
+    echo "开始安装 Alpine-Hysteria2..."
+    bash <(curl -fsSL https://github.com/mi1314cat/Alpine-script/raw/refs/heads/main/alpine-hysteria2.sh) || { echo "Hysteria2 安装失败"; return; }
+    read -p "安装完成，按回车返回主菜单..."
+    main_menu
+}
 
+install_xray() {
+    echo "开始安装 Xray 和 BBR 优化..."
+    bash <(curl -fsSL https://github.com/mi1314cat/Alpine-script/raw/refs/heads/main/bbr.sh) || { echo "BBR 安装失败"; return; }
+    bash <(curl -fsSL https://github.com/mi1314cat/Alpine-script/raw/refs/heads/main/allxray.sh) || { echo "Xray 安装失败"; return; }
+    read -p "安装完成，按回车返回主菜单..."
+    main_menu
+}
 
-fi
+install_singbox() {
+    echo "开始安装 Sing-box..."
+    bash <(curl -fsSL https://github.com/mi1314cat/sing-box-max/raw/refs/heads/main/sing-box.sh) || { echo "Sing-box 安装失败"; return; }
+    read -p "安装完成，按回车返回主菜单..."
+    main_menu
+}
 
+install_vless() {
+    echo "请选择脚本安装方式："
+    echo "1) 安装支持 IPv4 的脚本"
+    echo "2) 安装支持 IPv6 的脚本"
+    read -p "请输入选项 (1 或 2): " vchoice
+
+    case $vchoice in
+        1)
+            echo "安装支持 IPv4 的脚本..."
+            bash <(curl -fsSL https://github.com/mi1314cat/Alpine-script/raw/refs/heads/main/Avless.sh) || { echo "IPv4 脚本安装失败"; return; }
+            ;;
+        2)
+            echo "安装支持 IPv6 的脚本..."
+            bash <(curl -fsSL https://github.com/mi1314cat/Alpine-script/raw/refs/heads/main/A6vless.sh) || { echo "IPv6 脚本安装失败"; return; }
+            ;;
+        *)
+            echo "无效的选项，返回主菜单。"
+            ;;
+    esac
+    read -p "安装完成，按回车返回主菜单..."
+    main_menu
+}
+
+exit_program() {
+    echo "退出面板。感谢使用 Catmi Alpine 面板！"
+    exit 0
+}
+
+# 快捷方式设置函数
+create_shortcut() {
+    local shortcut_path="/usr/local/bin/catmi-panel"
+    echo "创建快捷方式：${shortcut_path}"
+    echo 'bash <(curl -fsSL https://cfgithub.gw2333.workers.dev/https://github.com/mi1314cat/Alpine-script/raw/refs/heads/main/alpine.sh)' > "$shortcut_path"
+    chmod +x "$shortcut_path"
+    echo "快捷方式创建成功！直接运行 'catmi-panel' 启动面板。"
+}
+
+# 主函数
+main() {
+    initialize_dependencies
+    create_shortcut
+    main_menu
+}
+
+main
