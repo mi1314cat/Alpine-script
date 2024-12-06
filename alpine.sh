@@ -19,7 +19,7 @@ main_menu() {
     echo "2) 安装 Alpine-Hysteria2"
     echo "3) 安装 BBR 优化"
     echo "4) 安装 Sing-box"
-    echo "5) 安装 VLESS（选择 IPv4 或 IPv6）"
+    echo "5) 安装 xray-VLESS-reality（选择 IPv4 或 IPv6）"
     echo "6) 退出面板"
     echo
     echo -n "请选择操作: "
