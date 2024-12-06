@@ -20,7 +20,7 @@ main_menu() {
     echo "3) 安装 BBR 优化"
     echo "4) 安装 Sing-box"
     echo "5) 安装 xray-VLESS-reality（选择 IPv4 或 IPv6）"
-    echo "6) 退出面板"
+    echo "0) 退出面板"
     echo
     echo -n "请选择操作: "
     read choice
@@ -28,10 +28,10 @@ main_menu() {
     case $choice in
         1) install_toolbox ;;
         2) install_hysteria ;;
-        3) install_xray ;;
+        3) install_bbr ;;
         4) install_singbox ;;
-        5) install_vless ;;
-        6) exit_program ;;
+        5) install_xray ;;
+        0) exit_program ;;
         *) 
             echo "无效选项，请重新选择。"
             read -p "按回车返回主菜单..."
@@ -56,7 +56,7 @@ install_hysteria() {
     main_menu
 }
 
-install_xray() {
+install_bbr() {
     echo "开始安装 BBR 优化..."
     bash <(curl -fsSL https://github.com/mi1314cat/Alpine-script/raw/refs/heads/main/bbr.sh) || { echo "BBR 安装失败"; return; }
     
@@ -66,12 +66,12 @@ install_xray() {
 
 install_singbox() {
     echo "开始安装 Sing-box..."
-    bash <(curl -fsSL https://github.com/mi1314cat/sing-box-max/raw/refs/heads/main/sing-box.sh) || { echo "Sing-box 安装失败"; return; }
+    bash <(wget -qO- https://raw.githubusercontent.com/fscarmen/sing-box/main/sing-box.sh) || { echo "Sing-box 安装失败"; return; }
     read -p "安装完成，按回车返回主菜单..."
     main_menu
 }
 
-install_vless() {
+install_xray() {
     echo "请选择脚本安装方式："
     echo "1) 安装支持 IPv4 的脚本"
     echo "2) 安装支持 IPv6 的脚本"
