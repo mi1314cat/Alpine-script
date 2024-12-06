@@ -17,7 +17,7 @@ main_menu() {
     echo -e "\e[0m"
     echo "1) 安装 Kejilion 工具箱"
     echo "2) 安装 Alpine-Hysteria2"
-    echo "3) 安装 Xray 和 BBR 优化"
+    echo "3) 安装 BBR 优化"
     echo "4) 安装 Sing-box"
     echo "5) 安装 VLESS（选择 IPv4 或 IPv6）"
     echo "6) 退出面板"
@@ -57,9 +57,9 @@ install_hysteria() {
 }
 
 install_xray() {
-    echo "开始安装 Xray 和 BBR 优化..."
+    echo "开始安装 BBR 优化..."
     bash <(curl -fsSL https://github.com/mi1314cat/Alpine-script/raw/refs/heads/main/bbr.sh) || { echo "BBR 安装失败"; return; }
-    bash <(curl -fsSL https://github.com/mi1314cat/Alpine-script/raw/refs/heads/main/allxray.sh) || { echo "Xray 安装失败"; return; }
+    
     read -p "安装完成，按回车返回主菜单..."
     main_menu
 }
@@ -80,11 +80,11 @@ install_vless() {
     case $vchoice in
         1)
             echo "安装支持 IPv4 的脚本..."
-            bash <(curl -fsSL https://github.com/mi1314cat/Alpine-script/raw/refs/heads/main/Avless.sh) || { echo "IPv4 脚本安装失败"; return; }
+            bash <(curl -fsSL https://github.com/mi1314cat/Alpine-script/raw/refs/heads/main/RWvless.sh) || { echo "IPv4 脚本安装失败"; return; }
             ;;
         2)
             echo "安装支持 IPv6 的脚本..."
-            bash <(curl -fsSL https://github.com/mi1314cat/Alpine-script/raw/refs/heads/main/A6vless.sh) || { echo "IPv6 脚本安装失败"; return; }
+            bash <(curl -fsSL https://github.com/mi1314cat/Alpine-script/raw/refs/heads/main/6RWvless.sh) || { echo "IPv6 脚本安装失败"; return; }
             ;;
         *)
             echo "无效的选项，返回主菜单。"
@@ -101,11 +101,11 @@ exit_program() {
 
 # 快捷方式设置函数
 create_shortcut() {
-    local shortcut_path="/usr/local/bin/catmi-panel"
+    local shortcut_path="/usr/local/bin/catmiap"
     echo "创建快捷方式：${shortcut_path}"
     echo 'bash <(curl -fsSL https://cfgithub.gw2333.workers.dev/https://github.com/mi1314cat/Alpine-script/raw/refs/heads/main/alpine.sh)' > "$shortcut_path"
     chmod +x "$shortcut_path"
-    echo "快捷方式创建成功！直接运行 'catmi-panel' 启动面板。"
+    echo "快捷方式创建成功！直接运行 'catmiap' 启动面板。"
 }
 
 # 主函数
