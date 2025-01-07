@@ -323,7 +323,6 @@ random_website() {
         "tidal.com"
         "zoro.to"
         "mora.jp"
-        "j-wave.co.jp"
         "booth.pm"
         "ivi.tv"
         "leercapitulo.com"
