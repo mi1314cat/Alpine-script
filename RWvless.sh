@@ -322,7 +322,6 @@ random_website() {
         "fandom.com"
         "tidal.com"
         "zoro.to"
-        "pixiv.co.jp"
         "mora.jp"
         "j-wave.co.jp"
         "booth.pm"
