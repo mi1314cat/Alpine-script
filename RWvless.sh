@@ -241,7 +241,7 @@ nginx() {
 
     # 创建 nginx 配置文件
     cat <<EOF > /etc/nginx/nginx.conf
-user www-data;
+user nobody;
 worker_processes auto;
 pid /run/nginx.pid;
 include /etc/nginx/modules-enabled/*.conf;
