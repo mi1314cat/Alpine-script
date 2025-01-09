@@ -614,6 +614,7 @@ cat << EOF > /root/catmi/xray/xhttp.json
     }
   }
 
+EOF
 {
     echo "xray 安装完成！"
     echo "服务器地址：${PUBLIC_IP}"
