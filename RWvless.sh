@@ -262,7 +262,7 @@ http {
     gzip on;
 
     server {
-        listen ${PORT} ssl;
+        listen ${VMES_PORT} ssl;
         server_name ${DOMAIN_LOWER};
 
         ssl_certificate       "${CERT_PATH}";
@@ -363,8 +363,6 @@ random_website() {
     echo "${domains[$random_index]}"
 }
 
-# 确保配置目录存在
-mkdir -p /root/Xray
 
 
 
