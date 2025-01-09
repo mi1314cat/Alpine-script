@@ -240,7 +240,7 @@ nginx() {
     apk add --no-cache nginx
 
     # 创建 nginx 配置文件
-    cat <<EOF >/etc/nginx/nginx.conf
+    cat <<EOF > /etc/nginx/nginx.conf
 user www-data;
 worker_processes auto;
 pid /run/nginx.pid;
@@ -262,7 +262,7 @@ http {
     gzip on;
 
     server {
-        listen [::]:${PORT} ssl;
+        listen ${PORT} ssl;
         server_name ${DOMAIN_LOWER};
 
         ssl_certificate       "${CERT_PATH}";
