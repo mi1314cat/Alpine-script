@@ -240,11 +240,11 @@ nginx() {
     apk add --no-cache nginx
 
     # 创建 nginx 配置文件
-    cat <<EOF >/etc/nginx/nginx.conf
-user nginx;
+    cat <<EOF > /etc/nginx/nginx.conf
+user nobody;
 worker_processes auto;
 pid /run/nginx.pid;
-include /etc/nginx/nginx.conf.d/*.conf;
+include /etc/nginx/modules-enabled/*.conf;
 
 events {
     worker_connections 1024;
@@ -267,7 +267,7 @@ http {
 
         ssl_certificate       "${CERT_PATH}";
         ssl_certificate_key   "${KEY_PATH}";
-
+        
         ssl_session_timeout 1d;
         ssl_session_cache shared:MozSSL:10m;
         ssl_session_tickets off;
@@ -298,6 +298,22 @@ http {
             proxy_set_header Connection "upgrade";
             proxy_set_header Host \$host;
         }
+        location ${WS_PATH1} {
+            proxy_redirect off;
+            proxy_pass http://127.0.0.1:9998;
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade \$http_upgrade;
+            proxy_set_header Connection "upgrade";
+            proxy_set_header Host \$host;
+        }
+        location ${WS_PATH2} {
+        proxy_request_buffering      off;
+        proxy_redirect off;
+        proxy_pass http://127.0.0.1:9997;
+        proxy_http_version 1.1;
+        proxy_set_header Host \$host;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+}
     }
 }
 EOF
@@ -347,8 +363,6 @@ random_website() {
     echo "${domains[$random_index]}"
 }
 
-# 确保配置目录存在
-mkdir -p /root/Xray
 
 
 
@@ -413,6 +427,8 @@ fi
 # 生成 UUID 和 WS 路径
 UUID=$(generate_uuid)
 WS_PATH=$(generate_ws_path)
+WS_PATH1=$(generate_ws_path)
+WS_PATH2=$(generate_ws_path)
 ssl
 
 # 配置文件生成
@@ -425,7 +441,7 @@ cat <<EOF > /etc/xrayS/config.json
         "timestamp": true
     },
     "inbounds": [
-         {
+        {
             "listen": "127.0.0.1",
             "port": 9999,
             "tag": "VLESS-WS",
@@ -447,6 +463,55 @@ cat <<EOF > /etc/xrayS/config.json
             }
         },
         {
+           "listen": "127.0.0.1",
+            "port": 9998,
+            "tag": "VEESS-WS",
+            "protocol": "vmess",
+            "settings": {
+                "clients": [
+                    {
+                        "id": "${UUID}",
+                        "alterId": 64
+                    }
+                ]
+            },
+            "streamSettings": {
+                "network": "ws",
+                "wsSettings": {
+                    "path": "${WS_PATH1}"
+                }
+            }
+        },
+        
+        {
+            "listen": "127.0.0.1",
+            "port": 9997,
+            "protocol": "vless",
+            "settings": {
+                "decryption": "none",
+                "clients": [
+                    {
+                        "id": "${UUID}"
+                    }
+                ]
+            },
+            "streamSettings": {
+                "network": "xhttp",
+                "xhttpSettings": {
+                    "path": "${WS_PATH2}"
+                }
+            },
+            "sniffing": {
+                "enabled": true,
+                "destOverride": [
+                    "http",
+                    "tls",
+                    "quic"
+                ]
+            },
+            "tag": "in1"
+        },
+        {
           "listen": "0.0.0.0",
           "port": $port,
           "protocol": "vless",
@@ -457,7 +522,13 @@ cat <<EOF > /etc/xrayS/config.json
                       "flow": "xtls-rprx-vision"
                   }
               ],
-              "decryption": "none"
+              "decryption": "none",
+              "fallbacks": [
+          { 
+            
+            "dest": 9997
+          }
+        ]
           },
           "streamSettings": {
               "network": "tcp",
@@ -479,16 +550,11 @@ cat <<EOF > /etc/xrayS/config.json
               }
           }
       }
-  ],
-    
+    ],
     "outbounds": [
         {
             "protocol": "freedom",
-            "tag": "direct"
-        },
-        {
-            "protocol": "blackhole",
-            "tag": "block"
+            "settings": {}
         }
     ]
 }
@@ -498,13 +564,15 @@ EOF
 rc-service xrayS start || { print_error "启动 xrayS 服务失败"; exit 1; }
 IP=$(wget -qO- --no-check-certificate -U Mozilla https://api.ip.sb/geoip | sed -n 's/.*"ip": *"\([^"]*\).*/\1/p')
 green "您的IP为：$IP"
-
+# 保存信息到文件
+OUTPUT_DIR="/root/catmi/xray"
+mkdir -p "$OUTPUT_DIR"
 # 生成分享链接
 share_link="vless://$UUID@$IP:$port?encryption=none&flow=xtls-rprx-vision&security=reality&sni=$dest_server&fp=chrome&pbk=$(cat /usr/local/etc/xray/publickey)&sid=$short_id&type=tcp&headerType=none#Reality"
-echo "${share_link}" > /root/Xray/share-link.txt
+echo "${share_link}" > /root/catmi/xray/share-link.txt
 
 # 生成 Clash Meta 配置文件
-cat << EOF > /root/Xray/clash-meta.yaml
+cat << EOF > /root/catmi/xray/clash-meta.yaml
 - name: Reality
   port:  $port
   server: "$IP"
@@ -522,18 +590,38 @@ cat << EOF > /root/Xray/clash-meta.yaml
   client-fingerprint: chrome
 EOF
 
+cat << EOF > /root/catmi/xray/xhttp.json
+{
+    "downloadSettings": {
+      "address": "$IP", 
+      "port": $port, 
+      "network": "xhttp", 
+      "xhttpSettings": {
+        "path": "${WS_PATH2}", 
+        "mode": "auto"
+      },
+      "security": "reality", 
+      "realitySettings":  {
+        "serverName": "$dest_server",
+        "fingerprint": "chrome",
+        "show": false,
+        "publicKey": "$(cat /usr/local/etc/xray/publickey)",
+        "shortId": "$short_id",
+        "spiderX": ""
+      }
+    }
+  }
 
-# 保存信息到文件
-OUTPUT_DIR="/root/xray"
-mkdir -p "$OUTPUT_DIR"
+EOF
 {
     echo "xray 安装完成！"
     echo "服务器地址：${PUBLIC_IP}"
     echo "vless 端口：${VMES_PORT}"
     echo "vless UUID：${UUID}"
     echo "vless WS 路径：${WS_PATH}"
-    
-    echo "配置文件已保存到：/root/xray"
+    echo "vmess WS 路径：${WS_PATH1}"
+    echo "xhttp 路径：${WS_PATH2}"
+    echo "配置文件已保存到：/root/catmi/xray"
 } > "$OUTPUT_DIR/xrayS.txt"
 
 print_info "xray 安装完成！"
