@@ -62,8 +62,8 @@ http {
             proxy_pass https://pan.imcxx.com; #伪装网址
             proxy_redirect off;
             proxy_ssl_server_name on;
-            sub_filter_once off;
-            sub_filter "pan.imcxx.com" \$server_name;
+            #sub_filter_once off;
+            #sub_filter "pan.imcxx.com" \$server_name;
             proxy_set_header Host "pan.imcxx.com";
             proxy_set_header Referer \$http_referer;
             proxy_set_header X-Real-IP \$remote_addr;
@@ -101,4 +101,8 @@ http {
     }
 }
 EOF
+sudo touch /var/run/nginx.pid
+sudo chown nobody:nobody /var/run/nginx.pid
+sudo /usr/local/nginx/sbin/nginx
+
 sudo /usr/local/nginx/sbin/nginx -s reload
