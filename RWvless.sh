@@ -236,30 +236,11 @@ else
 fi
 }
 nginx() {
-    # 安装编译工具和依赖项
-apk add build-base openssl-dev pcre-dev zlib-dev
+    # 使用 Alpine 的 apk 包管理器安装 nginx
+    apk add --no-cache nginx
 
-# 下载并解压 Nginx 源码
-wget https://nginx.org/download/nginx-1.24.0.tar.gz
-tar -xzvf nginx-1.24.0.tar.gz
-cd nginx-1.24.0
-
-# 清理上一次编译产生的文件
-make clean
-
-# 配置 Nginx 以启用 HTTP/2 和 SSL 模块
-./configure --with-http_v2_module --with-http_ssl_module
-
-# 编译 Nginx
-make
-
-# 安装 Nginx
-sudo make install
-
-# 验证 Nginx 版本
-/usr/local/nginx/sbin/nginx -v
-# 创建 nginx 配置文件
-    cat <<EOF > /usr/local/nginx/conf/nginx.conf
+    # 创建 nginx 配置文件
+    cat <<EOF > /etc/nginx/nginx.conf
 user nobody;
 worker_processes auto;
 pid /run/nginx.pid;
@@ -336,10 +317,12 @@ http {
     }
 }
 EOF
-sudo touch /var/run/nginx.pid
-sudo chown nobody:nobody /var/run/nginx.pid
-sudo /usr/local/nginx/sbin/nginx
-sudo /usr/local/nginx/sbin/nginx -s reload
+
+    # 创建 nginx 所需的目录（如果不存在）
+    mkdir -p /run/nginx
+
+    # 启动 nginx 服务
+    rc-service nginx restart
 }
 random_website() {
     domains=(
