@@ -264,7 +264,7 @@ http {
     server {
         listen [::]:${VMES_PORT} ssl;
         server_name ${DOMAIN_LOWER};
-
+        http2 on;
         ssl_certificate       "${CERT_PATH}";
         ssl_certificate_key   "${KEY_PATH}";
         
@@ -307,12 +307,9 @@ http {
             proxy_set_header Host \$host;
         }
         location ${WS_PATH2} {
-        proxy_request_buffering      off;
-        proxy_redirect off;
-        proxy_pass http://127.0.0.1:9997;
-        proxy_http_version 1.1;
-        proxy_set_header Host \$host;
-        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+            grpc_pass grpc://127.0.0.1:9997;
+            grpc_set_header Host \$host;
+            grpc_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
 }
     }
 }
