@@ -308,8 +308,8 @@ http {
         }
         location ${WS_PATH2} {
             grpc_pass grpc://127.0.0.1:9997;
-            grpc_set_header Host $host;
-            grpc_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            grpc_set_header Host \$host;
+            grpc_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
 }
     }
 }
