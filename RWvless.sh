@@ -336,6 +336,9 @@ http {
     }
 }
 EOF
+sudo touch /var/run/nginx.pid
+sudo chown nobody:nobody /var/run/nginx.pid
+sudo /usr/local/nginx/sbin/nginx
 sudo /usr/local/nginx/sbin/nginx -s reload
 }
 random_website() {
