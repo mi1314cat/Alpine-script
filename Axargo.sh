@@ -440,7 +440,7 @@ fi
 UUID=$(generate_uuid)
 WS_PATH=$(generate_ws_path)
 WS_PATH1=$(generate_ws_path)
-WS_PATH2=$(generate_ws_path)
+
 }
 xray_config() {
 # 配置文件生成
