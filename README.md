@@ -9,6 +9,10 @@ apk add curl && apk add bash && bash <(curl -fsSL https://cfgithub.gw2333.worker
 ```bash
 bash <(curl -fsSL https://github.com/mi1314cat/Alpine-script/raw/refs/heads/main/RWvless.sh)
 ```
+## argo vless+ws 域名 reality 二合一
+```bash
+bash <(curl -fsSL https://github.com/mi1314cat/Alpine-script/raw/refs/heads/main/Axargo.sh)
+```
 ## vless+ws 域名
 ### v4
 ```bash
