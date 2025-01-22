@@ -262,7 +262,7 @@ http {
     gzip on;
 
     server {
-        listen ${VMES_PORT} ssl;
+        listen $VALUE${VMES_PORT} ssl;
         server_name ${DOMAIN_LOWER};
         http2 on;
         ssl_certificate       "${CERT_PATH}";
@@ -410,14 +410,22 @@ echo "公网 IPv6 地址: $PUBLIC_IP_V6"
 echo "请选择要使用的公网 IP 地址:"
 echo "1. $PUBLIC_IP_V4"
 echo "2. $PUBLIC_IP_V6"
-read -p "请输入对应的数字选择: " IP_CHOICE
+read -p "请输入对应的数字选择 [默认1]: " IP_CHOICE
 
+# 如果没有输入（即回车），则默认选择1
+IP_CHOICE=${IP_CHOICE:-1}
+
+# 选择公网 IP 地址
 if [ "$IP_CHOICE" -eq 1 ]; then
     PUBLIC_IP=$PUBLIC_IP_V4
+    # 设置第二个变量为“空”
+    VALUE=""
 elif [ "$IP_CHOICE" -eq 2 ]; then
     PUBLIC_IP=$PUBLIC_IP_V6
+    # 设置第二个变量为 "[::]:"
+    VALUE="[::]:"
 else
-    print_error "无效选择，退出脚本"
+    echo "无效选择，退出脚本"
     exit 1
 fi
 
@@ -565,8 +573,12 @@ green "您的IP为：$IP"
 OUTPUT_DIR="/root/catmi/xray"
 mkdir -p "$OUTPUT_DIR"
 # 生成分享链接
-share_link="vless://$UUID@$IP:$port?encryption=none&flow=xtls-rprx-vision&security=reality&sni=$dest_server&fp=chrome&pbk=$(cat /usr/local/etc/xray/publickey)&sid=$short_id&type=tcp&headerType=none#Reality"
-echo "${share_link}" > /root/catmi/xray/share-link.txt
+share_link="
+vless://$UUID@$IP:$port?encryption=none&flow=xtls-rprx-vision&security=reality&sni=$dest_server&fp=chrome&pbk=$(cat /usr/local/etc/xray/publickey)&sid=$short_id&type=tcp&headerType=none#Reality
+vless://$UUID@$DOMAIN_LOWER:443?encryption=none&security=tls&sni=$DOMAIN_LOWER&allowInsecure=1&type=ws&host=$DOMAIN_LOWER&path=${WS_PATH}#vless-ws-tls
+vmess://$UUID@$DOMAIN_LOWER:443?encryption=none&security=tls&sni=$DOMAIN_LOWER&allowInsecure=1&type=ws&host=$DOMAIN_LOWER&path=${WS_PATH1}#vmess-ws-tls
+"
+echo "${share_link}" > /root/catmi/xray.txt
 
 # 生成 Clash Meta 配置文件
 cat << EOF > /root/catmi/xray/clash-meta.yaml
