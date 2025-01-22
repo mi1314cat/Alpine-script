@@ -73,18 +73,18 @@ install_singbox() {
 
 install_xray() {
     echo "请选择脚本安装方式："
-    echo "1) 安装支持 IPv4 的脚本"
-    echo "2) 安装支持 IPv6 的脚本"
+    echo "1) 安装nginx-xray vless vmess xhttp reality"
+    echo "2) 安装nginx-xray-argo vless vmess reality"
     read -p "请输入选项 (1 或 2): " vchoice
 
     case $vchoice in
         1)
-            echo "安装支持 IPv4 的脚本..."
-            bash <(curl -fsSL https://github.com/mi1314cat/Alpine-script/raw/refs/heads/main/RWvless.sh) || { echo "IPv4 脚本安装失败"; return; }
+            echo "安装nginx-xray vless vmess xhttp reality"
+            bash <(curl -fsSL https://github.com/mi1314cat/Alpine-script/raw/refs/heads/main/RWvless.sh) || { echo "脚本安装失败"; return; }
             ;;
         2)
-            echo "安装支持 IPv6 的脚本..."
-            bash <(curl -fsSL https://github.com/mi1314cat/Alpine-script/raw/refs/heads/main/6RWvless.sh) || { echo "IPv6 脚本安装失败"; return; }
+            echo "安装nginx-xray-argo vless vmess reality"
+            bash <(curl -fsSL https://github.com/mi1314cat/Alpine-script/raw/refs/heads/main/Axargo.sh) || { echo "脚本安装失败"; return; }
             ;;
         *)
             echo "无效的选项，返回主菜单。"
