@@ -639,8 +639,7 @@ print_info "vless 端口：${VMES_PORT}"
 print_info "vless UUID：${UUID}"
 print_info "vless WS 路径：${WS_PATH}"
 print_info "配置文件已保存到：/root/xray/xrayS.txt"
-cat /root/Xray/share-link.txt
-cat /root/Xray/clash-meta.yaml
-cat /root/xray/xrayS.txt
+
 rc-service xrayS status
 nginx
+cat /root/catmi/xray.txt
