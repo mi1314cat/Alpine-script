@@ -156,6 +156,7 @@ EOF
 
 # 定义运行隧道函数
 run_tunnel() {
+    apk add screen
     install_package screen
     screen -dmS CloudFlare cloudflared tunnel --config /root/catmi/CloudFlare.yml run
     print_info "隧道已运行成功，请等待1-3分钟启动并解析完毕"
