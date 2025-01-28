@@ -15,22 +15,26 @@ main_menu() {
     echo "                   Catmi Alpine 面板            "
     echo "================================================="
     echo -e "\e[0m"
+    echo "00) 安装基础依赖"
     echo "1) 安装 Kejilion 工具箱"
     echo "2) 安装 Alpine-Hysteria2"
     echo "3) 安装 BBR 优化"
     echo "4) 安装 Sing-box"
     echo "5) 安装 xray"
+    echo "6) 节点信息"
     echo "0) 退出面板"
     echo
     echo -n "请选择操作: "
     read choice
 
     case $choice in
+        00) initialize_dependencies ;;
         1) install_toolbox ;;
         2) install_hysteria ;;
         3) install_bbr ;;
         4) install_singbox ;;
         5) install_xray ;;
+        6) catmi-xx ;;
         0) exit_program ;;
         *) 
             echo "无效选项，请重新选择。"
@@ -93,7 +97,15 @@ install_xray() {
     read -p "安装完成，按回车返回主菜单..."
     main_menu
 }
-
+catmi-xx() {
+    cat /root/catmi/xray/clash-meta.yaml
+    echo "*********************************"
+    cat /root/catmi/xray.txt
+    echo "*********************************"
+    cat /root/catmi/xray/xhttp.json
+    
+    
+}
 exit_program() {
     echo "退出面板。感谢使用 Catmi Alpine 面板！"
     exit 0
@@ -110,7 +122,7 @@ create_shortcut() {
 
 # 主函数
 main() {
-    initialize_dependencies
+    
     create_shortcut
     main_menu
 }
