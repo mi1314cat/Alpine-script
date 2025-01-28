@@ -583,23 +583,26 @@ echo "${share_link}" > /root/catmi/xray.txt
 
 # 生成 Clash Meta 配置文件
 cat << EOF > /root/catmi/xray/clash-meta.yaml
-- name: Reality
-  port:  $port
-  server: "$IP"
-  type: vless
-  network: tcp
-  udp: true
-  tls: true
-  servername: "$dest_server"
-  skip-cert-verify: true
-  reality-opts:
-    public-key: $(cat /usr/local/etc/xray/publickey)
-    short-id: $short_id
-  uuid: "$UUID"
-  flow: xtls-rprx-vision
-  client-fingerprint: chrome
-- {"name":"vmess-ws-tls","type":"vmess","server":"$DOMAIN_LOWER","port":443,"cipher":"auto","uuid":"$UUID","alterId":0,"tls":true,"network":"ws","ws-opts":{"path":"${WS_PATH1}","headers":{"Host":"$DOMAIN_LOWER"}},"servername":"$DOMAIN_LOWER"}
-- {"type":"vless","name":"vless-ws-tls","server":"$DOMAIN_LOWER","port":443,"uuid":"$UUID","tls":true,"skip-cert-verify":true,"network":"ws","ws-opts":{"headers":{"Host":"$DOMAIN_LOWER"},"path":"${WS_PATH}"},"servername":"$DOMAIN_LOWER"}  
+  - name: Reality
+    port:  $port
+    server: "$IP"
+    type: vless
+    network: tcp
+    udp: true
+    tls: true
+    servername: "$dest_server"
+    skip-cert-verify: true
+    reality-opts:
+      public-key: $(cat /usr/local/etc/xray/publickey)
+      short-id: $short_id
+    uuid: "$UUID"
+    flow: xtls-rprx-vision
+    client-fingerprint: chrome
+    
+  - {"name":"vmess-ws-tls","type":"vmess","server":"$DOMAIN_LOWER","port":443,"cipher":"auto","uuid":"$UUID","alterId":0,"tls":true,"network":"ws","ws-opts":{"path":"${WS_PATH1}","headers":{"Host":"$DOMAIN_LOWER"}},"servername":"$DOMAIN_LOWER"}
+  
+  - {"type":"vless","name":"vless-ws-tls","server":"$DOMAIN_LOWER","port":443,"uuid":"$UUID","tls":true,"skip-cert-verify":true,"network":"ws","ws-opts":{"headers":{"Host":"$DOMAIN_LOWER"},"path":"${WS_PATH}"},"servername":"$DOMAIN_LOWER"}  
+
 EOF
 
 cat << EOF > /root/catmi/xray/xhttp.json
