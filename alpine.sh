@@ -100,6 +100,8 @@ install_xray() {
     main_menu
 }
 catmi-xx() {
+    cat /root/hy2/config.yaml
+    echo "*********************************"
     cat /root/catmi/xray/clash-meta.yaml
     echo "*********************************"
     cat /root/catmi/xray.txt
