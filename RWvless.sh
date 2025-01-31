@@ -238,10 +238,10 @@ fi
 nginx() {
     # 使用 Alpine 的 apk 包管理器安装 nginx
     apk add --no-cache nginx
-    mkdir -p /var/lib/nginx/logs
-    touch /var/lib/nginx/logs/error.log /var/lib/nginx/logs/access.log
-    chown -R nginx:nginx /var/lib/nginx/logs
-    chmod -R 755 /var/lib/nginx/logs
+    mkdir -p /var/log/nginx
+    touch /var/log/nginx/error.log /var/log/nginx/access.log
+    chown -R nginx:nginx /var/log/nginx
+    chmod -R 755 /var/log/nginx
 
 
     # 创建 nginx 配置文件
