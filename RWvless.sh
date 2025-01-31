@@ -241,7 +241,7 @@ nginx() {
 
     # 创建 nginx 配置文件
     cat <<EOF > /etc/nginx/nginx.conf
-user nobody;
+user nginx;
 worker_processes auto;
 pid /run/nginx.pid;
 include /etc/nginx/modules-enabled/*.conf;
@@ -256,7 +256,7 @@ http {
     tcp_nodelay on;
     keepalive_timeout 65;
     types_hash_max_size 2048;
-
+    
     include /etc/nginx/mime.types;
     default_type application/octet-stream;
     gzip on;
