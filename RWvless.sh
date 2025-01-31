@@ -238,6 +238,11 @@ fi
 nginx() {
     # 使用 Alpine 的 apk 包管理器安装 nginx
     apk add --no-cache nginx
+    mkdir -p /var/lib/nginx/logs
+    touch /var/lib/nginx/logs/error.log /var/lib/nginx/logs/access.log
+    chown -R nginx:nginx /var/lib/nginx/logs
+    chmod -R 755 /var/lib/nginx/logs
+
 
     # 创建 nginx 配置文件
     cat <<EOF > /etc/nginx/nginx.conf
@@ -256,7 +261,8 @@ http {
     tcp_nodelay on;
     keepalive_timeout 65;
     types_hash_max_size 2048;
-    
+    error_log /var/log/nginx/error.log;
+    access_log /var/log/nginx/access.log;
     include /etc/nginx/mime.types;
     default_type application/octet-stream;
     gzip on;
