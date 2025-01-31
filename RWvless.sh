@@ -324,9 +324,8 @@ EOF
     # 创建 nginx 所需的目录（如果不存在）
     mkdir -p /run/nginx
     
-     nginx
-    # 启动 nginx 服务
-    nginx -t && nginx -s reload
+     # 启动 nginx 服务
+    rc-service nginx restart
 }
 random_website() {
     domains=(
