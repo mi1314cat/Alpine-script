@@ -79,11 +79,16 @@ install_singbox() {
 
 install_xray() {
     echo "请选择脚本安装方式："
+    echo "0) 安装跟新xray-core"
     echo "1) 安装nginx-xray vless vmess xhttp reality"
     echo "2) 安装nginx-xray-argo vless vmess reality"
     read -p "请输入选项 (1 或 2): " vchoice
 
     case $vchoice in
+        0)
+            echo "安装跟新xray-core"
+            bash <(curl -fsSL https://github.com/mi1314cat/Alpine-script/raw/refs/heads/main/Aupxray.sh) || { echo "脚本安装失败"; return; }
+            ;;
         1)
             echo "安装nginx-xray vless vmess xhttp reality"
             bash <(curl -fsSL https://github.com/mi1314cat/Alpine-script/raw/refs/heads/main/RWvless.sh) || { echo "脚本安装失败"; return; }
