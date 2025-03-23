@@ -82,7 +82,7 @@ install_xray() {
     echo "0) 安装跟新xray-core"
     echo "1) 安装nginx-xray vless vmess xhttp reality"
     echo "2) 安装nginx-xray-argo vless vmess reality"
-    read -p "请输入选项 (1 或 2): " vchoice
+    read -p "请输入选项 : " vchoice
 
     case $vchoice in
         0)
