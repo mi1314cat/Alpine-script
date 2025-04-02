@@ -33,6 +33,6 @@
 
 
 # 执行安装函数
-install_xray
+
 rc-service xrayS restart 
 rc-service xrayS status
