@@ -1,5 +1,4 @@
-install_xray() {
-    # 获取最新版本号
+
     VERSION=$(curl -s "https://api.github.com/repos/XTLS/Xray-core/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
     if [[ -z "$VERSION" ]]; then
         print_error "无法获取 Xray 最新版本信息"
@@ -31,7 +30,7 @@ install_xray() {
     rm -f Xray-linux-${ARCH}.zip  # 清理下载的 zip 文件
 
     chmod +x /usr/local/bin/xrayS || { print_error "修改权限失败"; exit 1; }
-}
+
 
 # 执行安装函数
 install_xray
