@@ -69,13 +69,13 @@ apk add curl&&apk add bash && bash <(curl -Ls https://raw.githubusercontent.com/
 ```
 ## alpine服务
  ```bash
-service xrayR stop
+rc-service xrayS stop
 ```
 ### xrayR重启
 ```bash
-service xrayR restart 
+rc-service xrayS restart 
 ```
 ### 查看xrayR状态
 ```bash
-service xrayR status
+rc-service xrayS status
 ```
