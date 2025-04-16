@@ -126,10 +126,17 @@ rc-update add xrayS default
 # 生成端口的函数
 generate_port() {
     local protocol="$1"
+    local port user_input
+
     while :; do
-        port=$((RANDOM % 10001 + 10000))
-        read -p "请为 ${protocol} 输入监听端口(默认为随机生成): " user_input
-        port=${user_input:-$port}
+        read -p "请为 ${protocol} 输入监听端口(留空则自动生成): " user_input
+
+        if [[ -z "$user_input" ]]; then
+            port=$((RANDOM % 10001 + 10000))
+        else
+            port=$user_input
+        fi
+
         if ! ss -tuln | grep -q ":$port\b"; then
             echo "$port"
             return 0
@@ -138,6 +145,7 @@ generate_port() {
         fi
     done
 }
+
 ssl() {
    echo "请选择要执行的操作："
 echo "1) 有80和443端口"
