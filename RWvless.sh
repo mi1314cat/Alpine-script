@@ -132,19 +132,32 @@ generate_port() {
         read -p "请为 ${protocol} 输入监听端口(留空则自动生成): " user_input
 
         if [[ -z "$user_input" ]]; then
-            port=$((RANDOM % 10001 + 10000))
+            # 用户没输入，尝试随机找一个未被占用的端口
+            while :; do
+                port=$((RANDOM % 10001 + 10000))
+                if ! ss -tuln | grep -q ":$port\b"; then
+                    echo "$port"
+                    return 0
+                fi
+            done
         else
-            port=$user_input
-        fi
+            # 用户输入了端口，判断是否为数字
+            if ! [[ "$user_input" =~ ^[0-9]+$ ]]; then
+                echo -e "❌ 请输入有效的数字端口号\n"
+                continue
+            fi
 
-        if ! ss -tuln | grep -q ":$port\b"; then
-            echo "$port"
-            return 0
-        else
-            echo "端口 $port 被占用，请输入其他端口"
+            port=$user_input
+            if ! ss -tuln | grep -q ":$port\b"; then
+                echo "$port"
+                return 0
+            else
+                echo -e "❌ 端口 $port 被占用，请输入其他端口\n"
+            fi
         fi
     done
 }
+
 
 ssl() {
    echo "请选择要执行的操作："
