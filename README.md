@@ -7,7 +7,7 @@ apk add curl && apk add bash && bash <(curl -fsSL https://cfgithub.gw2333.worker
 ```
 ### sing-box脚本
 ```bash
-apk add curl && apk add bash && bash <(curl -Ls https://github.com/mi1314cat/Alpine-script/raw/refs/heads/main/sing-box.sh))
+apk add curl && apk add bash && bash <(curl -Ls https://github.com/mi1314cat/Alpine-script/raw/refs/heads/main/sing-box.sh)
 ```
 ## vless+ws 域名 reality 二合一
 ```bash
