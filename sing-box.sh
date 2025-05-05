@@ -55,6 +55,7 @@ generate_port() {
 generate_ws_path() {
     echo "/$(tr -dc 'a-zA-Z0-9' < /dev/urandom | head -c 10)"
 }
+apk add --no-cache wget curl git openssh openssl openrc
 mkdir -p /root/catmi/singbox
 
 
