@@ -345,11 +345,7 @@ http {
             proxy_set_header Connection "upgrade";
             proxy_set_header Host \$host;
         }
-        location ${WS_PATH2} {
-            grpc_pass grpc://127.0.0.1:9997;
-            grpc_set_header Host \$host;
-            grpc_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-}
+        
     }
 }
 EOF
@@ -665,7 +661,7 @@ echo "${share_link}" > /root/catmi/singbox/v2ray.txt
 
 
 
-sudo systemctl status singbox
+rc-service singbox status
 nginx 
 cat /root/catmi/singbox/v2ray.txt
 cat /root/catmi/singbox/clash-meta.yaml
