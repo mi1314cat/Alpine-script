@@ -423,8 +423,7 @@ WS_PATH1=$(generate_ws_path)
 key_pair=$(/root/catmi/singbox/sing-box generate reality-keypair)
 private_key=$(echo "$key_pair" | awk '/PrivateKey/ {print $2}' | tr -d '"')
 public_key=$(echo "$key_pair" | awk '/PublicKey/ {print $2}' | tr -d '"')
-info "生成的公钥为:  $public_key"
-info "生成的私钥为:  $private_key"
+
 short_id=$(/root/catmi/singbox/sing-box generate rand --hex 8)
 hy_password=$(/root/catmi/singbox/sing-box generate rand --hex 8)
 
