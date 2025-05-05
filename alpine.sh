@@ -71,23 +71,50 @@ install_bbr() {
 }
 
 install_singbox() {
-    echo "开始安装 Sing-box..."
-    bash <(wget -qO- https://raw.githubusercontent.com/fscarmen/sing-box/main/sing-box.sh) || { echo "Sing-box 安装失败"; return; }
+    echo "选择 Sing-box 安装源:"
+    echo "0) 返回主菜单"
+    echo "1) 使用 catmi "
+    echo "2) 使用 sb "
+    read -p "请输入选项 [0-2]: " choice
+
+    case $choice in
+        0)
+            echo "已选择返回主菜单..."
+            main_menu
+            return
+            ;;
+        1)
+            echo "开始安装 Sing-box ..."
+            bash <(curl -Ls https://github.com/mi1314cat/Alpine-script/raw/refs/heads/main/sing-box.sh) || { echo "Sing-box 安装失败"; return; }
+            ;;
+        2)
+            echo "开始安装 Sing-box ..."
+            bash <(wget -qO- https://raw.githubusercontent.com/fscarmen/sing-box/main/sing-box.sh) || { echo "Sing-box 安装失败"; return; }
+            ;;
+        *)
+            echo "无效的选项，返回主菜单..."
+            main_menu
+            return
+            ;;
+    esac
+
     read -p "安装完成，按回车返回主菜单..."
     main_menu
 }
 
 install_xray() {
     echo "请选择脚本安装方式："
-    echo "0) 安装跟新xray-core"
+    echo "0) 返回主菜单"
     echo "1) 安装nginx-xray vless vmess xhttp reality"
     echo "2) 安装nginx-xray-argo vless vmess reality"
+    echo "3) 安装跟新xray-core"
     read -p "请输入选项 : " vchoice
 
     case $vchoice in
         0)
-            echo "安装跟新xray-core"
-            bash <(curl -fsSL https://github.com/mi1314cat/Alpine-script/raw/refs/heads/main/Aupxray.sh) || { echo "脚本安装失败"; return; }
+            echo "已选择返回主菜单..."
+            main_menu
+            return
             ;;
         1)
             echo "安装nginx-xray vless vmess xhttp reality"
@@ -97,6 +124,10 @@ install_xray() {
             echo "安装nginx-xray-argo vless vmess reality"
             bash <(curl -fsSL https://github.com/mi1314cat/Alpine-script/raw/refs/heads/main/Axargo.sh) || { echo "脚本安装失败"; return; }
             ;;
+        3)
+            echo "安装跟新xray-core"
+            bash <(curl -fsSL https://github.com/mi1314cat/Alpine-script/raw/refs/heads/main/Aupxray.sh) || { echo "脚本安装失败"; return; }
+            ;;    
         *)
             echo "无效的选项，返回主菜单。"
             ;;
@@ -106,9 +137,13 @@ install_xray() {
 }
 catmi-xx() {
     cat /root/hy2/config.yaml
-    echo "*********************************"
+    
     cat /root/catmi/xray/clash-meta.yaml
+    
+    cat /root/catmi/singbox/clash-meta.yaml
+
     echo "*********************************"
+    cat /root/catmi/singbox/v2ray.txt
     cat /root/catmi/xray.txt
     echo "*********************************"
     cat /root/catmi/xray/xhttp.json
