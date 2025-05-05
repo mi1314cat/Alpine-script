@@ -598,7 +598,7 @@ cat <<EOF > /root/catmi/singbox/config.json
     ]
   }
 }
-}
+
 
 
 
