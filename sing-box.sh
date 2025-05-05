@@ -400,10 +400,20 @@ read -rp "请输入回落域名: " dest_server
 # 提示输入监听端口号
 read -p "请输入 Vless 监听端口 (默认为 443): " PORT
 PORT=${PORT:-443}
-reality_port=$(generate_port "reality")
-hysteria2_port=$(generate_port "hysteria2")
-tuic_port=$(generate_port "tuic")
-anytls_port=$(generate_port "anytls")
+read -p "请输入 reality 监听端口: " reality_port
+if [[ -z "$reality_port" ]]; then
+    reality_port=$((RANDOM % 55535 + 10000))  # 生成 10000-65535 的随机端口
+fi
+
+hysteria2_port=$((reality_port + 1))
+tuic_port=$((reality_port + 2))
+anytls_port=$((reality_port + 3))
+
+echo "已设置端口如下："
+echo "reality:   $reality_port"
+echo "hysteria2: $hysteria2_port"
+echo "tuic:      $tuic_port"
+echo "anytls:    $anytls_port"
 # 生成 UUID 和 WS 路径
 UUID=$(generate_uuid)
 WS_PATH=$(generate_ws_path)
