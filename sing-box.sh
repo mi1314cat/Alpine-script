@@ -427,9 +427,7 @@ public_key=$(echo "$key_pair" | awk '/PublicKey/ {print $2}' | tr -d '"')
 short_id=$(/root/catmi/singbox/sing-box generate rand --hex 8)
 hy_password=$(/root/catmi/singbox/sing-box generate rand --hex 8)
 
-# 获取公网 IP 地址
-PUBLIC_IP_V4=$(curl -s https://api.ipify.org)
-PUBLIC_IP_V6=$(curl -s https://api64.ipify.org)
+
 
 
 # 获取公网 IP 地址
