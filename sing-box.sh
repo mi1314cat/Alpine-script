@@ -616,11 +616,11 @@ OUTPUT_DIR="/root/catmi/singbox"
 mkdir -p "$OUTPUT_DIR"
 cat << EOF > /root/catmi/singbox/clash-meta.yaml
   - name: Hysteria2
-    server: "$PUBLIC_IP"
+    server: $PUBLIC_IP
     port: $hysteria2_port
     type: hysteria2
-    up: "40 Mbps"
-    down: "150 Mbps"
+    up: 40 Mbps
+    down: 150 Mbps
     sni: bing.com
     password: $hy_password
     skip-cert-verify: true
@@ -628,28 +628,70 @@ cat << EOF > /root/catmi/singbox/clash-meta.yaml
       - h3
   - name: Reality
     port: $reality_port
-    server: "$PUBLIC_IP"
+    server: $PUBLIC_IP
     type: vless
     network: tcp
     udp: true
     tls: true
-    servername: "$dest_server"
+    servername: $dest_server
     skip-cert-verify: true
     reality-opts:
       public-key: $public_key
       short-id: $short_id
-    uuid: "$UUID"
+    uuid: $UUID
     flow: xtls-rprx-vision
     client-fingerprint: chrome
-    
-  - {"name":"vmess-ws-tls","type":"vmess","server":"$DOMAIN_LOWER","port":443,"cipher":"auto","uuid":"$UUID","alterId":0,"tls":true,"network":"ws","ws-opts":{"path":"${WS_PATH1}","headers":{"Host":"$DOMAIN_LOWER"}},"servername":"$DOMAIN_LOWER"}
-  
-  - {"type":"vless","name":"vless-ws-tls","server":"$DOMAIN_LOWER","port":443,"uuid":"$UUID","tls":true,"skip-cert-verify":true,"network":"ws","ws-opts":{"headers":{"Host":"$DOMAIN_LOWER"},"path":"${WS_PATH}"},"servername":"$DOMAIN_LOWER"}  
-  
-  - {name: "anytls", type: anytls, server: $PUBLIC_IP, port: $anytls_port, password: $UUID, client-fingerprint: chrome, udp: true, idle-session-check-interval: 30, idle-session-timeout: 30, skip-cert-verify: true }
-  
-  - {name: "tuic", type: tuic, server: $PUBLIC_IP, port: $tuic_port, uuid: $UUID, password: $hy_password, alpn: [h3], disable-sni: true, reduce-rtt: true, request-timeout: 8000, udp-relay-mode: native, congestion-controller: bbr, skip-cert-verify: true}
-
+  - name: vmess-ws-tls
+    type: vmess
+    server: $DOMAIN_LOWER
+    port: 443
+    cipher: auto
+    uuid: $UUID
+    alterId: 0
+    tls: true
+    network: ws
+    ws-opts:
+      path: ${WS_PATH1}
+      headers:
+        Host: $DOMAIN_LOWER
+    servername: $DOMAIN_LOWER
+  - type: vless
+    name: vless-ws-tls
+    server: $DOMAIN_LOWER
+    port: 443
+    uuid: $UUID
+    tls: true
+    skip-cert-verify: true
+    network: ws
+    ws-opts:
+      headers:
+        Host: $DOMAIN_LOWER
+      path: ${WS_PATH}
+    servername: $DOMAIN_LOWER
+  - name: anytls
+    type: anytls
+    server: $PUBLIC_IP
+    port: $anytls_port
+    password: $UUID
+    client-fingerprint: chrome
+    udp: true
+    idle-session-check-interval: 30
+    idle-session-timeout: 30
+    skip-cert-verify: true
+  - name: tuic
+    type: tuic
+    server: $PUBLIC_IP
+    port: $tuic_port
+    uuid: $UUID
+    password: $hy_password
+    alpn:
+      - h3
+    disable-sni: true
+    reduce-rtt: true
+    request-timeout: 8000
+    udp-relay-mode: native
+    congestion-controller: bbr
+    skip-cert-verify: true
 EOF
 
 
