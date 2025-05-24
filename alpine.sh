@@ -3,7 +3,7 @@
 # 基础依赖检查和安装
 initialize_dependencies() {
     echo "检查并安装基础依赖..."
-    apk update && apk add iproute2 wget bash curl sudo || { echo "依赖安装失败，请检查网络环境！"; exit 1; }
+    apk add curl socat git cronie openssl gzip unzip sudo wget bash || { echo "依赖安装失败，请检查网络环境！"; exit 1; }
     echo "基础依赖安装完成。"
     read -p "安装完成，按回车返回主菜单..."
     main_menu
