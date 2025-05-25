@@ -641,6 +641,8 @@ cat << EOF > /root/catmi/xray/clash-meta.yaml
     port: 443
     uuid: $UUID
     tls: true
+    alterId: 0
+    cipher: auto
     skip-cert-verify: true
     network: ws
     ws-opts:
