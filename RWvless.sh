@@ -701,7 +701,7 @@ EOF
     echo "vless WS 路径：${WS_PATH}"
     echo "vmess WS 路径：${WS_PATH1}"
     echo "xhttp 路径：${WS_PATH2}"
-    echo "配置文件已保存到：/root/catmi/xray"
+    
 } > "$OUTPUT_DIR/xrayS.txt"
 
 print_info "xray 安装完成！"
