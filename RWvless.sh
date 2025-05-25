@@ -443,10 +443,12 @@ if [ "$IP_CHOICE" -eq 1 ]; then
     PUBLIC_IP=$PUBLIC_IP_V4
     # 设置第二个变量为“空”
     VALUE=""
+    link_ip="$PUBLIC_IP"
 elif [ "$IP_CHOICE" -eq 2 ]; then
     PUBLIC_IP=$PUBLIC_IP_V6
     # 设置第二个变量为 "[::]:"
     VALUE="[::]:"
+    link_ip="[$PUBLIC_IP]"
 else
     echo "无效选择，退出脚本"
     exit 1
@@ -597,7 +599,7 @@ OUTPUT_DIR="/root/catmi/xray"
 mkdir -p "$OUTPUT_DIR"
 # 生成分享链接
 share_link="
-vless://$UUID@$IP:$port?encryption=none&flow=xtls-rprx-vision&security=reality&sni=$dest_server&fp=chrome&pbk=$(cat /usr/local/etc/xray/publickey)&sid=$short_id&type=tcp&headerType=none#Reality
+vless://$UUID@$link_ip:$port?encryption=none&flow=xtls-rprx-vision&security=reality&sni=$dest_server&fp=chrome&pbk=$(cat /usr/local/etc/xray/publickey)&sid=$short_id&type=tcp&headerType=none#Reality
 vless://$UUID@$DOMAIN_LOWER:443?encryption=none&security=tls&sni=$DOMAIN_LOWER&allowInsecure=1&type=ws&host=$DOMAIN_LOWER&path=${WS_PATH}#vless-ws-tls
 vless://$UUID@$DOMAIN_LOWER:443?encryption=none&security=tls&sni=$DOMAIN_LOWER&type=xhttp&host=$DOMAIN_LOWER&path=${WS_PATH2}&mode=auto#vless-xhttp-tls
 vmess://$UUID@$DOMAIN_LOWER:443?encryption=none&security=tls&sni=$DOMAIN_LOWER&allowInsecure=1&type=ws&host=$DOMAIN_LOWER&path=${WS_PATH1}#vmess-ws-tls
