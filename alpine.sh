@@ -143,21 +143,56 @@ install_xray() {
     main_menu
 }
 catmi-xx() {
-    cat /root/hy2/config.yaml
-    cat /root/catmi/xrayls/clash-meta.yaml
-    cat /root/catmi/mihomo/clash-meta.yaml
-    cat /root/catmi/singbox/clash-meta.yaml
+    echo "========== 配置文件 =========="
+
+    for file in \
+        /root/hy2/config.yaml \
+        /root/catmi/xrayls/clash-meta.yaml \
+        /root/catmi/mihomo/clash-meta.yaml \
+        /root/catmi/singbox/clash-meta.yaml
+    do
+        echo "------ $file ------"
+        if [ -f "$file" ]; then
+            cat "$file"
+        else
+            echo "[未找到] $file"
+        fi
+        echo
+    done
+
     echo "*********************************"
-    cat /root/catmi/singbox/v2ray.txt
-    cat /root/catmi/mihomo/v2ray.txt
-    cat /root/catmi/xray.txt
+    echo "========== V2Ray 文件 =========="
+
+    for file in \
+        /root/catmi/singbox/v2ray.txt \
+        /root/catmi/mihomo/v2ray.txt \
+        /root/catmi/xray.txt
+    do
+        echo "------ $file ------"
+        if [ -f "$file" ]; then
+            cat "$file"
+        else
+            echo "[未找到] $file"
+        fi
+        echo
+    done
+
     echo "*********************************"
-    cat /root/catmi/xrayls/xhttp.json
+    echo "========== xhttp.json =========="
+
+    file=/root/catmi/xrayls/xhttp.json
+    echo "------ $file ------"
+    if [ -f "$file" ]; then
+        cat "$file"
+    else
+        echo "[未找到] $file"
+    fi
+
+    echo
     read -p "安装完成，按回车返回主菜单..."
     main_menu
-    
-    
 }
+
 exit_program() {
     echo "退出面板。感谢使用 Catmi Alpine 面板！"
     exit 0
