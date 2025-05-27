@@ -23,7 +23,8 @@ main_menu() {
     echo "3) 安装 BBR 优化"
     echo "4) 安装 Sing-box"
     echo "5) 安装 xray"
-    echo "6) 节点信息"
+    echo "6) 安装 mihomo"
+    echo "99) 节点信息"
     echo "0) 退出面板"
     echo
     echo -n "请选择操作: "
@@ -36,7 +37,8 @@ main_menu() {
         3) install_bbr ;;
         4) install_singbox ;;
         5) install_xray ;;
-        6) catmi-xx ;;
+        6) bash <(curl -fsSL https://cfgithub.gw2333.workers.dev/https://github.com/mi1314cat/mihomo--core/raw/refs/heads/main/mihomo-au.sh) ;;
+        99) catmi-xx ;;
         0) exit_program ;;
         *) 
             echo "无效选项，请重新选择。"
