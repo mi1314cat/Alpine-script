@@ -144,18 +144,18 @@ install_xray() {
 }
 catmi-xx() {
     cat /root/hy2/config.yaml
-    
-    cat /root/catmi/xray/clash-meta.yaml
-    
+    cat /root/catmi/xrayls/clash-meta.yaml
+    cat /root/catmi/mihomo/clash-meta.yaml
     cat /root/catmi/singbox/clash-meta.yaml
-
     echo "*********************************"
     cat /root/catmi/singbox/v2ray.txt
+    cat /root/catmi/mihomo/v2ray.txt
     cat /root/catmi/xray.txt
     echo "*********************************"
-    cat /root/catmi/xray/xhttp.json
+    cat /root/catmi/xrayls/xhttp.json
     read -p "安装完成，按回车返回主菜单..."
     main_menu
+    
     
 }
 exit_program() {
