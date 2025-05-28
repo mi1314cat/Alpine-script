@@ -15,7 +15,8 @@ fi
 # 系统信息
 SYSTEM_NAME=$(cat /etc/os-release | grep -i pretty_name | cut -d \" -f2)
 CORE_ARCH=$(arch)
-
+INSTALL_DIR="/root/catmi/xray"
+mkdir -p $INSTALL_DIR
 # 介绍信息
 clear
 cat << "EOF"
@@ -80,10 +81,10 @@ install_xray() {
     echo "正在下载 Xray 版本 ${VERSION}..."
     curl -L "https://github.com/XTLS/Xray-core/releases/download/${VERSION}/Xray-linux-${ARCH}.zip" -o Xray-linux-${ARCH}.zip || { print_error "下载 Xray 失败"; exit 1; }
     unzip Xray-linux-${ARCH}.zip || { print_error "解压 Xray 失败"; exit 1; }
-    mv xray /usr/local/bin/xrayS || { print_error "移动文件失败"; exit 1; }
+    mv xray $INSTALL_DIR/xrayS || { print_error "移动文件失败"; exit 1; }
     rm -f Xray-linux-${ARCH}.zip  # 清理下载的 zip 文件
 
-    chmod +x /usr/local/bin/xrayS || { print_error "修改权限失败"; exit 1; }
+    chmod +x $INSTALL_DIR/xrayS || { print_error "修改权限失败"; exit 1; }
 }
 
 # 执行安装函数
@@ -95,8 +96,8 @@ cat <<EOF >/etc/init.d/xrayS
 
 description="XrayS Service"
 
-command="/usr/local/bin/xrayS"
-command_args="-c /etc/xrayS/config.json"
+command="$INSTALL_DIR/xrayS"
+command_args="-c $INSTALL_DIR/config.json"
 pidfile="/run/xrayS.pid"
 
 depend() {
@@ -158,237 +159,10 @@ generate_port() {
     done
 }
 
+bash <(curl -fsSL https://github.com/mi1314cat/One-click-script/raw/refs/heads/main/domains.sh)
 
-ssl() {
-   echo "请选择要执行的操作："
-echo "1) 有80和443端口"
-echo "2) 无80 443端口"
-read -p "请输入选项 (1 或 2): " choice
+dest_server=$(grep '^dest_server' /root/catmi/dest_server.txt | sed 's/.*[:：]//')
 
-# 提示用户输入域名和电子邮件地址
-read -p "请输入域名: " DOMAIN
-
-# 将用户输入的域名转换为小写
-DOMAIN_LOWER=$(echo "$DOMAIN" | tr '[:upper:]' '[:lower:]')
-
-read -p "请输入电子邮件地址: " EMAIL
-
-# 创建目标目录
-TARGET_DIR="/root/catmi"
-mkdir -p "$TARGET_DIR"
-
-if [ "$choice" -eq 1 ]; then
-    # 选项 1: 安装更新、克隆仓库并执行脚本
-    echo "执行安装acme证书..."
-
-    # 更新系统并安装必要的依赖项
-    echo "更新系统并安装依赖项..."
-    apk update && apk upgrade
-    apk add ufw
-    apk add --no-cache curl socat git bash openssl
-    ufw disable
-    # 安装 acme.sh
-    echo "安装 acme.sh..."
-    curl https://get.acme.sh | sh
-
-    # 设置路径
-    export PATH="$HOME/.acme.sh:$PATH"
-
-    # 注册账户
-    echo "注册账户..."
-    "$HOME/.acme.sh/acme.sh" --register-account -m "$EMAIL"
-
-    # 申请 SSL 证书
-    echo "申请 SSL 证书..."
-    if ! "$HOME/.acme.sh/acme.sh" --issue --standalone -d "$DOMAIN_LOWER"; then
-        echo "证书申请失败，删除已生成的文件和文件夹。"
-        rm -f "$HOME/${DOMAIN_LOWER}.key" "$HOME/${DOMAIN_LOWER}.crt"
-        "$HOME/.acme.sh/acme.sh" --remove -d "$DOMAIN_LOWER"
-        exit 1
-    fi
-
-    # 安装 SSL 证书并移动到目标目录
-    echo "安装 SSL 证书..."
-    "$HOME/.acme.sh/acme.sh" --installcert -d "$DOMAIN_LOWER" \
-        --key-file       "$TARGET_DIR/${DOMAIN_LOWER}.key" \
-        --fullchain-file "$TARGET_DIR/${DOMAIN_LOWER}.crt"
-         CERT_PATH="$TARGET_DIR/${DOMAIN_LOWER}.crt"
-        KEY_PATH="$TARGET_DIR/${DOMAIN_LOWER}.key"
-    # 提示用户证书已生成
-    echo "SSL 证书和私钥已生成并移动到 $TARGET_DIR:"
-    echo "证书: $TARGET_DIR/${DOMAIN_LOWER}.crt"
-    echo "私钥: $TARGET_DIR/${DOMAIN_LOWER}.key"
-
-    # 创建自动续期的脚本
-    cat << EOF > /root/renew_cert.sh
-#!/bin/sh
-export PATH="\$HOME/.acme.sh:\$PATH"
-\$HOME/.acme.sh/acme.sh --renew -d "$DOMAIN_LOWER" --key-file "$TARGET_DIR/${DOMAIN_LOWER}.key" --fullchain-file "$TARGET_DIR/${DOMAIN_LOWER}.crt"
-EOF
-    chmod +x /root/renew_cert.sh
-
-    # 创建自动续期的 cron 任务，每天午夜执行一次
-    (crontab -l 2>/dev/null; echo "0 0 * * * /root/renew_cert.sh >> /var/log/renew_cert.log 2>&1") | crontab -
-
-    echo "完成！请确保在您的 Web 服务器配置中使用新的 SSL 证书。"
-
-elif [ "$choice" -eq 2 ]; then
-    # 选项 2: 手动获取 SSL 证书安装至/etc/letsencrypt/live/$DOMAIN_LOWER 文件夹
-    echo "将进行手动获取 SSL 证书安装至/etc/letsencrypt/live/$DOMAIN_LOWER  文件夹..."
-
-    # 安装 Certbot
-    echo "安装 Certbot..."
-    apk add certbot
-
-    # 手动获取证书
-    echo "手动获取证书..."
-    certbot certonly --manual --preferred-challenges dns -d "$DOMAIN_LOWER"
-
-    
-
-    # 创建自动续期的 cron 任务
-    (crontab -l 2>/dev/null; echo "0 0 * * * certbot renew") | crontab -
-
-    echo "SSL 证书已安装至/etc/letsencrypt/live/$DOMAIN_LOWER 目录中"
-    CERT_PATH="/etc/letsencrypt/live/$DOMAIN_LOWER/fullchain.pem"
-    KEY_PATH="/etc/letsencrypt/live/$DOMAIN_LOWER/privkey.pem"
-else
-    echo "无效选项，请输入 1 或 2."
-fi
-}
-nginx() {
-    # 使用 Alpine 的 apk 包管理器安装 nginx
-    apk add --no-cache nginx
-    mkdir -p /var/log/nginx
-    touch /var/log/nginx/error.log /var/log/nginx/access.log
-    chown -R nginx:nginx /var/log/nginx
-    chmod -R 755 /var/log/nginx
-
-
-    # 创建 nginx 配置文件
-    cat <<EOF > /etc/nginx/nginx.conf
-user nginx;
-worker_processes auto;
-pid /run/nginx.pid;
-include /etc/nginx/modules-enabled/*.conf;
-
-events {
-    worker_connections 1024;
-}
-
-http {
-    sendfile on;
-    tcp_nopush on;
-    tcp_nodelay on;
-    keepalive_timeout 65;
-    types_hash_max_size 2048;
-    error_log /var/log/nginx/error.log;
-    access_log /var/log/nginx/access.log;
-    include /etc/nginx/mime.types;
-    default_type application/octet-stream;
-    gzip on;
-
-    server {
-        listen $VALUE${VMES_PORT} ssl;
-        server_name ${DOMAIN_LOWER};
-        http2 on;
-        ssl_certificate       "${CERT_PATH}";
-        ssl_certificate_key   "${KEY_PATH}";
-        
-        ssl_session_timeout 1d;
-        ssl_session_cache shared:MozSSL:10m;
-        ssl_session_tickets off;
-        ssl_protocols    TLSv1.2 TLSv1.3;
-        ssl_prefer_server_ciphers off;
-
-        location / {
-            proxy_pass https://pan.imcxx.com; #伪装网址
-            proxy_redirect off;
-            proxy_ssl_server_name on;
-            sub_filter_once off;
-            sub_filter "pan.imcxx.com" \$server_name;
-            proxy_set_header Host "pan.imcxx.com";
-            proxy_set_header Referer \$http_referer;
-            proxy_set_header X-Real-IP \$remote_addr;
-            proxy_set_header User-Agent \$http_user_agent;
-            proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-            proxy_set_header X-Forwarded-Proto https;
-            proxy_set_header Accept-Encoding "";
-            proxy_set_header Accept-Language "zh-CN";
-        }
-
-        location ${WS_PATH} {
-            proxy_redirect off;
-            proxy_pass http://127.0.0.1:9999;
-            proxy_http_version 1.1;
-            proxy_set_header Upgrade \$http_upgrade;
-            proxy_set_header Connection "upgrade";
-            proxy_set_header Host \$host;
-        }
-        location ${WS_PATH1} {
-            proxy_redirect off;
-            proxy_pass http://127.0.0.1:9998;
-            proxy_http_version 1.1;
-            proxy_set_header Upgrade \$http_upgrade;
-            proxy_set_header Connection "upgrade";
-            proxy_set_header Host \$host;
-        }
-        location ${WS_PATH2} {
-            grpc_pass grpc://127.0.0.1:9997;
-            grpc_set_header Host \$host;
-            grpc_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-}
-    }
-}
-EOF
-
-    # 创建 nginx 所需的目录（如果不存在）
-    mkdir -p /run/nginx
-    
-     # 启动 nginx 服务
-    rc-service nginx restart
-}
-random_website() {
-    domains=(
-        "one-piece.com"
-        "lovelive-anime.jp"
-        "swift.com"
-        "academy.nvidia.com"
-        "cisco.com"
-        "amd.com"
-        "apple.com"
-        "music.apple.com"
-        "fandom.com"
-        "tidal.com"
-        "mora.jp"
-        "booth.pm"
-        "leercapitulo.com"
-        "itunes.apple.com"
-        "download-installer.cdn.mozilla.net"
-        "images-na.ssl-images-amazon.com"
-        "swdist.apple.com"
-        "swcdn.apple.com"
-        "updates.cdn-apple.com"
-        "mensura.cdn-apple.com"
-        "osxapps.itunes.apple.com"
-        "aod.itunes.apple.com"
-        "www.google-analytics.com"
-        "dl.google.com"
-    )
-
-    total_domains=${#domains[@]}
-    random_index=$((RANDOM % total_domains))
-    
-    # 输出选择的域名
-    echo "${domains[$random_index]}"
-}
-
-
-
-
-# 生成密钥
-read -rp "请输入回落域名: " dest_server
-[ -z "$dest_server" ] && dest_server=$(random_website)
 # 生成随机 ID
 short_id=$(dd bs=4 count=2 if=/dev/urandom | xxd -p -c 8)
 
@@ -397,7 +171,7 @@ getkey() {
     mkdir -p /usr/local/etc/xray
 
     # 生成密钥并保存到文件
-    /usr/local/bin/xrayS x25519 > /usr/local/etc/xray/key || {
+    $INSTALL_DIR/xrayS x25519 > /usr/local/etc/xray/key || {
         print_error "生成密钥失败"
         return 1
     }
@@ -426,8 +200,6 @@ VMES_PORT=$(generate_port "vless")
 # 获取公网 IP 地址
 PUBLIC_IP_V4=$(curl -s https://api.ipify.org)
 PUBLIC_IP_V6=$(curl -s https://api64.ipify.org)
-echo "公网 IPv4 地址: $PUBLIC_IP_V4"
-echo "公网 IPv6 地址: $PUBLIC_IP_V6"
 
 # 选择使用哪个公网 IP 地址
 echo "请选择要使用的公网 IP 地址:"
@@ -459,11 +231,10 @@ UUID=$(generate_uuid)
 WS_PATH=$(generate_ws_path)
 WS_PATH1=$(generate_ws_path)
 WS_PATH2=$(generate_ws_path)
-ssl
 
-# 配置文件生成
-mkdir -p /etc/xrayS
-cat <<EOF > /etc/xrayS/config.json
+
+
+cat <<EOF > $INSTALL_DIR/config.json
 {
     "log": {
         "disabled": false,
@@ -473,7 +244,7 @@ cat <<EOF > /etc/xrayS/config.json
     "inbounds": [
         {
             "listen": "127.0.0.1",
-            "port": 9999,
+            "port": 9998,
             "tag": "VLESS-WS",
             "protocol": "VLESS",
             "settings": {
@@ -488,13 +259,13 @@ cat <<EOF > /etc/xrayS/config.json
             "streamSettings": {
                 "network": "ws",
                 "wsSettings": {
-                    "path": "${WS_PATH}"
+                    "path": "${WS_PATH1}"
                 }
             }
         },
         {
            "listen": "127.0.0.1",
-            "port": 9998,
+            "port": 9999,
             "tag": "VEESS-WS",
             "protocol": "vmess",
             "settings": {
@@ -508,7 +279,7 @@ cat <<EOF > /etc/xrayS/config.json
             "streamSettings": {
                 "network": "ws",
                 "wsSettings": {
-                    "path": "${WS_PATH1}"
+                    "path": "${WS_PATH}"
                 }
             }
         },
@@ -594,20 +365,31 @@ EOF
 rc-service xrayS start || { print_error "启动 xrayS 服务失败"; exit 1; }
 IP=$(wget -qO- --no-check-certificate -U Mozilla https://api.ip.sb/geoip | sed -n 's/.*"ip": *"\([^"]*\).*/\1/p')
 green "您的IP为：$IP"
-# 保存信息到文件
-OUTPUT_DIR="/root/catmi/xray"
-mkdir -p "$OUTPUT_DIR"
+{
+    echo "xray 安装完成！"
+    echo "服务器地址：${PUBLIC_IP}"
+    echo "IP_CHOICE：${IP_CHOICE}"
+    echo "端口：${PORT}"
+    echo "UUID：${UUID}"
+    echo "vless WS 路径：${WS_PATH1}"
+    echo "vmess WS 路径：${WS_PATH}"
+    echo "xhttp 路径：${WS_PATH2}"
+    
+} > "/root/catmi/install_info.txt"
+bash <(curl -fsSL https://github.com/mi1314cat/Alpine-script/raw/refs/heads/main/xray-nginx.sh)
+
+DOMAIN_LOWER=$(grep '^DOMAIN_LOWER' /root/catmi/DOMAIN_LOWER.txt | sed 's/.*[:：]//')
 # 生成分享链接
 share_link="
 vless://$UUID@$link_ip:$port?encryption=none&flow=xtls-rprx-vision&security=reality&sni=$dest_server&fp=chrome&pbk=$(cat /usr/local/etc/xray/publickey)&sid=$short_id&type=tcp&headerType=none#Reality
-vless://$UUID@$DOMAIN_LOWER:443?encryption=none&security=tls&sni=$DOMAIN_LOWER&allowInsecure=1&type=ws&host=$DOMAIN_LOWER&path=${WS_PATH}#vless-ws-tls
+vless://$UUID@$DOMAIN_LOWER:443?encryption=none&security=tls&sni=$DOMAIN_LOWER&allowInsecure=1&type=ws&host=$DOMAIN_LOWER&path=${WS_PATH1}#vless-ws-tls
 vless://$UUID@$DOMAIN_LOWER:443?encryption=none&security=tls&sni=$DOMAIN_LOWER&type=xhttp&host=$DOMAIN_LOWER&path=${WS_PATH2}&mode=auto#vless-xhttp-tls
-vmess://$UUID@$DOMAIN_LOWER:443?encryption=none&security=tls&sni=$DOMAIN_LOWER&allowInsecure=1&type=ws&host=$DOMAIN_LOWER&path=${WS_PATH1}#vmess-ws-tls
+vmess://$UUID@$DOMAIN_LOWER:443?encryption=none&security=tls&sni=$DOMAIN_LOWER&allowInsecure=1&type=ws&host=$DOMAIN_LOWER&path=${WS_PATH}#vmess-ws-tls
 "
-echo "${share_link}" > /root/catmi/xray.txt
+echo "${share_link}" > $INSTALL_DIR/v2ray.txt
 
 # 生成 Clash Meta 配置文件
-cat << EOF > /root/catmi/xray/clash-meta.yaml
+cat << EOF > $INSTALL_DIR/clash-meta.yaml
   - name: Reality
     port: $port
     server: $PUBLIC_IP
@@ -633,7 +415,7 @@ cat << EOF > /root/catmi/xray/clash-meta.yaml
     tls: true
     network: ws
     ws-opts:
-      path: ${WS_PATH1}
+      path: ${WS_PATH}
       headers:
         Host: $DOMAIN_LOWER
     servername: $DOMAIN_LOWER
@@ -650,11 +432,11 @@ cat << EOF > /root/catmi/xray/clash-meta.yaml
     ws-opts:
       headers:
         Host: $DOMAIN_LOWER
-      path: ${WS_PATH}
+      path: ${WS_PATH1}
     servername: $DOMAIN_LOWER
 EOF
 
-cat << EOF > /root/catmi/xray/xhttp.json
+cat << EOF > $INSTALL_DIR/xhttp.json
 {
     "downloadSettings": {
       "address": "$IP", 
@@ -695,19 +477,10 @@ cat << EOF > /root/catmi/xray/xhttp.json
   }
 }
 EOF
-{
-    echo "xray 安装完成！"
-    echo "服务器地址：${PUBLIC_IP}"
-    echo "vless 端口：${VMES_PORT}"
-    echo "vless UUID：${UUID}"
-    echo "vless WS 路径：${WS_PATH}"
-    echo "vmess WS 路径：${WS_PATH1}"
-    echo "xhttp 路径：${WS_PATH2}"
-    
-} > "$OUTPUT_DIR/xrayS.txt"
+
 
 
 
 rc-service xrayS status
-nginx
-cat /root/catmi/xray.txt
+
+cat $INSTALL_DIR/v2ray.txt
