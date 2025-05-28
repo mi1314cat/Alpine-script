@@ -158,10 +158,10 @@ fi
 echo "$KEY_CONTENT" > "$KEY_PATH"
 echo "✅ 私钥已保存到 $KEY_PATH"
 apk add acl
-setfacl -m u:www-data:x /root
-setfacl -m u:www-data:x $CERT_DIR
-setfacl -m u:www-data:r $KEY_PATH
-setfacl -m u:www-data:r $CERT_PATH
+setfacl -m u:nginx:x /root
+setfacl -m u:nginx:x $CERT_DIR
+setfacl -m u:nginx:r $KEY_PATH
+setfacl -m u:nginx:r $CERT_PATH
 # 设置权限
 chmod 644 "$CERT_PATH" "$KEY_PATH"
 echo "🔐 权限已设置为 644"
