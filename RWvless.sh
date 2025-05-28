@@ -159,7 +159,7 @@ generate_port() {
 }
 
 
-ssl() {
+ssl_dns() {
    echo "请选择要执行的操作："
 echo "1) 有80和443端口"
 echo "2) 无80 443端口"
@@ -255,6 +255,27 @@ elif [ "$choice" -eq 2 ]; then
 else
     echo "无效选项，请输入 1 或 2."
 fi
+}
+ssl_sd() {
+    CERT_DIR="/etc/catmi"
+    CERT_PATH="${CERT_DIR}/server.crt"
+    KEY_PATH="${CERT_DIR}/server.key"
+    mkdir -p "$CERT_DIR"
+
+    read -p "请输入申请证书的域名: " DOMAIN_LOWER
+
+    echo "📄 粘贴证书内容（以 -----BEGIN CERTIFICATE----- 开头），Ctrl+D 结束："
+    CERT_CONTENT=$(</dev/stdin)
+    [ -z "$CERT_CONTENT" ] && echo "❌ 证书内容不能为空！" && exit 1
+    echo "$CERT_CONTENT" > "$CERT_PATH"
+
+    echo "🔑 粘贴私钥内容（以 -----BEGIN PRIVATE KEY----- 开头），Ctrl+D 结束："
+    KEY_CONTENT=$(</dev/stdin)
+    [ -z "$KEY_CONTENT" ] && echo "❌ 私钥内容不能为空！" && exit 1
+    echo "$KEY_CONTENT" > "$KEY_PATH"
+
+    chmod 644 "$CERT_PATH" "$KEY_PATH"
+    export CERT_PATH KEY_PATH DOMAIN_LOWER
 }
 nginx() {
     # 使用 Alpine 的 apk 包管理器安装 nginx
@@ -459,7 +480,23 @@ UUID=$(generate_uuid)
 WS_PATH=$(generate_ws_path)
 WS_PATH1=$(generate_ws_path)
 WS_PATH2=$(generate_ws_path)
-ssl
+
+
+echo "请选择申请证书的方式:"
+echo "1. 自动 DNS验证 "
+echo "2. 手动输入 "
+read -p "请输入对应的数字选择 [默认1]: " Certificate
+Certificate=${Certificate:-1}
+
+if [ "$Certificate" -eq 1 ]; then
+    ssl_dns
+elif [ "$Certificate" -eq 2 ]; then
+    ssl_sd
+else
+    echo "无效选择，退出脚本"
+    exit 1
+fi
+
 
 # 配置文件生成
 mkdir -p /etc/xrayS
