@@ -120,7 +120,7 @@ else
 fi
 }
 ssl_sd(){
-CERT_DIR="/root/catmi"
+CERT_DIR="/etc/catmi"
 CERT_PATH="${CERT_DIR}/server.crt"
 KEY_PATH="${CERT_DIR}/server.key"
 
@@ -157,11 +157,7 @@ fi
 # 保存私钥
 echo "$KEY_CONTENT" > "$KEY_PATH"
 echo "✅ 私钥已保存到 $KEY_PATH"
-apk add acl
-setfacl -m u:nginx:x /root
-setfacl -m u:nginx:x $CERT_DIR
-setfacl -m u:nginx:r $KEY_PATH
-setfacl -m u:nginx:r $CERT_PATH
+
 # 设置权限
 chmod 644 "$CERT_PATH" "$KEY_PATH"
 echo "🔐 权限已设置为 644"
@@ -169,7 +165,7 @@ echo "🔐 权限已设置为 644"
 echo "🎉 所有操作完成！"
 }
 nginxsl() {
-    # 使用 Alpine 的 apk 包管理器安装 nginx
+ # 使用 Alpine 的 apk 包管理器安装 nginx
     apk add --no-cache nginx
     mkdir -p /var/log/nginx
     touch /var/log/nginx/error.log /var/log/nginx/access.log
@@ -250,13 +246,14 @@ http {
             grpc_set_header Host \$host;
             grpc_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
 }
-        
     }
 }
 EOF
 
     # 创建 nginx 所需的目录（如果不存在）
     mkdir -p /run/nginx
+    
+     # 启动 nginx 服务
     rc-service nginx restart
 }
 
