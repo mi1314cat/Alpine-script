@@ -120,7 +120,7 @@ else
 fi
 }
 ssl_sd(){
-CERT_DIR="/root/catmi"
+CERT_DIR="/etc/catmi"
 CERT_PATH="${CERT_DIR}/server.crt"
 KEY_PATH="${CERT_DIR}/server.key"
 
@@ -157,11 +157,7 @@ fi
 # 保存私钥
 echo "$KEY_CONTENT" > "$KEY_PATH"
 echo "✅ 私钥已保存到 $KEY_PATH"
-apk add acl
-setfacl -m u:nginx:x /root
-setfacl -m u:nginx:x $CERT_DIR
-setfacl -m u:nginx:r $KEY_PATH
-setfacl -m u:nginx:r $CERT_PATH
+
 # 设置权限
 chmod 644 "$CERT_PATH" "$KEY_PATH"
 echo "🔐 权限已设置为 644"
