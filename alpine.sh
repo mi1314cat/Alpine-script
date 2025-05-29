@@ -143,11 +143,11 @@ install_xray() {
     main_menu
 }
 catmi-xx() {
-    echo "========== 配置文件 =========="
+      echo "========== 配置文件 =========="
 
     for file in \
         /root/hy2/config.yaml \
-        /root/catmi/xrayls/clash-meta.yaml \
+        /root/catmi/xray/clash-meta.yaml \
         /root/catmi/mihomo/clash-meta.yaml \
         /root/catmi/singbox/clash-meta.yaml
     do
@@ -166,7 +166,7 @@ catmi-xx() {
     for file in \
         /root/catmi/singbox/v2ray.txt \
         /root/catmi/mihomo/v2ray.txt \
-        /root/catmi/xray.txt
+        /root/catmi/xray/v2ray.txt
     do
         echo "------ $file ------"
         if [ -f "$file" ]; then
@@ -180,7 +180,7 @@ catmi-xx() {
     echo "*********************************"
     echo "========== xhttp.json =========="
 
-    file=/root/catmi/xrayls/xhttp.json
+    file=/root/catmi/xray/xhttp.json
     echo "------ $file ------"
     if [ -f "$file" ]; then
         cat "$file"
